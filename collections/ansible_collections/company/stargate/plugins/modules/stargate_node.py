@@ -267,7 +267,7 @@ def run_module():
             response, status_code = stargate_api_wrapper(
                 module, 'PUT', endpoint,
                 data={'status': 'maintenance'},
-                headers={"Authorization": "Bearer {}".(token)},
+                headers={"Authorization": "Bearer {}".format(token)},
                 timeout=timeout
             )
             result['changed'] = True
