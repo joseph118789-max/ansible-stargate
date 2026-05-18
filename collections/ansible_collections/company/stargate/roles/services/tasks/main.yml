@@ -1,0 +1,100 @@
+---
+# tasks file for services role
+
+- name: Get all services
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+  register: service_list_result
+  when: service_operation | default('list') == 'list' and service_id is not defined
+
+- name: Get service by ID
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    service_id: "{{ service_id }}"
+  register: service_result
+  when: service_id is defined
+
+- name: Filter services by status
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    status: "{{ service_status }}"
+  register: filtered_services
+  when: service_operation | default('list') == 'list' and service_status is defined
+
+- name: Filter services by type
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    service_type: "{{ service_type }}"
+  register: filtered_services
+  when: service_operation | default('list') == 'list' and service_type is defined
+
+- name: Start a service
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    service_id: "{{ service_id }}"
+    start: true
+  register: start_result
+  when: service_operation == 'start' and service_id is defined
+
+- name: Stop a service
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    service_id: "{{ service_id }}"
+    stop: true
+  register: stop_result
+  when: service_operation == 'stop' and service_id is defined
+
+- name: Restart a service
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    service_id: "{{ service_id }}"
+    restart: true
+  register: restart_result
+  when: service_operation == 'restart' and service_id is defined
+
+- name: Delete a service
+  company.stargate.stargate_service:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    service_id: "{{ service_id }}"
+    state: absent
+  register: delete_result
+  when: service_operation == 'delete' and service_id is defined
+
+- name: Set service facts for downstream tasks
+  ansible.builtin.set_fact:
+    services: "{{ service_list_result.services }}"
+    service_count: "{{ service_list_result.count }}"
+    target_service: "{{ service_result.service }}"
+  when: service_id is not defined

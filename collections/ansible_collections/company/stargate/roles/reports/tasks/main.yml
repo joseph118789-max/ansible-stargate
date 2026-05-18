@@ -1,0 +1,84 @@
+---
+# tasks file for reports role
+
+- name: Gather alarms report data
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/alarms"
+  register: alarms_report
+  when: report_type == 'alarms' or report_type == 'full'
+
+- name: Gather nodes report data
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/nodes"
+  register: nodes_report
+  when: report_type == 'nodes' or report_type == 'full'
+
+- name: Gather services report data
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/services"
+  register: services_report
+  when: report_type == 'services' or report_type == 'full'
+
+- name: Generate uptime summary for nodes
+  ansible.builtin.set_fact:
+    node_uptime_summary:
+      total: "{{ nodes_report.data | length if nodes_report.data is iterable else 0 }}"
+      online: "{{ (nodes_report.data | selectattr('status', 'equalto', 'online') | list | length) if nodes_report.data is iterable else 0 }}"
+      offline: "{{ (nodes_report.data | selectattr('status', 'equalto', 'offline') | list | length) if nodes_report.data is iterable else 0 }}"
+      maintenance: "{{ (nodes_report.data | selectattr('status', 'equalto', 'maintenance') | list | length) if nodes_report.data is iterable else 0 }}"
+
+- name: Generate alarm severity summary
+  ansible.builtin.set_fact:
+    alarm_severity_summary:
+      total: "{{ alarms_report.data | length if alarms_report.data is iterable else 0 }}"
+      critical: "{{ (alarms_report.data | selectattr('severity', 'equalto', 'critical') | list | length) if alarms_report.data is iterable else 0 }}"
+      high: "{{ (alarms_report.data | selectattr('severity', 'equalto', 'high') | list | length) if alarms_report.data is iterable else 0 }}"
+      medium: "{{ (alarms_report.data | selectattr('severity', 'equalto', 'medium') | list | length) if alarms_report.data is iterable else 0 }}"
+      low: "{{ (alarms_report.data | selectattr('severity', 'equalto', 'low') | list | length) if alarms_report.data is iterable else 0 }}"
+
+- name: Generate service status summary
+  ansible.builtin.set_fact:
+    service_status_summary:
+      total: "{{ services_report.data | length if services_report.data is iterable else 0 }}"
+      running: "{{ (services_report.data | selectattr('status', 'equalto', 'running') | list | length) if services_report.data is iterable else 0 }}"
+      stopped: "{{ (services_report.data | selectattr('status', 'equalto', 'stopped') | list | length) if services_report.data is iterable else 0 }}"
+      failed: "{{ (services_report.data | selectattr('status', 'equalto', 'failed') | list | length) if services_report.data is iterable else 0 }}"
+
+- name: Build full report data structure
+  ansible.builtin.set_fact:
+    stargate_report:
+      generated_at: "{{ ansible_date_time.iso8601 }}"
+      report_type: "{{ report_type }}"
+      server: "{{ stargate_server }}"
+      alarms: "{{ alarm_severity_summary if report_type in ['alarms', 'full'] else {} }}"
+      nodes: "{{ node_uptime_summary if report_type in ['nodes', 'full'] else {} }}"
+      services: "{{ service_status_summary if report_type in ['services', 'full'] else {} }}"
+      raw_alarms: "{{ alarms_report.data if report_type in ['alarms', 'full'] and report_include_raw | bool else [] }}"
+      raw_nodes: "{{ nodes_report.data if report_type in ['nodes', 'full'] and report_include_raw | bool else [] }}"
+      raw_services: "{{ services_report.data if report_type in ['services', 'full'] and report_include_raw | bool else [] }}"
+
+- name: Save report to file
+  ansible.builtin.copy:
+    content: "{{ stargate_report | to_nice_json }}"
+    dest: "{{ report_dest_path }}/stargate_report_{{ report_type }}_{{ ansible_date_time.epoch }}.json"
+    mode: "{{ report_file_mode }}"
+  when: report_save | bool
+
+- name: Set report fact
+  ansible.builtin.set_fact:
+    report_path: "{{ report_dest_path }}/stargate_report_{{ report_type }}_{{ ansible_date_time.epoch }}.json"

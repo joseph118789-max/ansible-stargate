@@ -1,0 +1,13 @@
+---
+# defaults file for services role
+
+stargate_server: "https://localhost:9443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+
+service_operation: list
+service_id: ""
+service_status: ""
+service_type: ""

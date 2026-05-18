@@ -1,0 +1,4 @@
+---
+# vars file for backup role
+
+stargate_api_version: "11.7.0"

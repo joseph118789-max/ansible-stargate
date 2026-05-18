@@ -1,0 +1,14 @@
+---
+# defaults file for reports role
+
+stargate_server: "https://localhost:9443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+
+report_type: full
+report_dest_path: "/var/reports/stargate"
+report_file_mode: "0644"
+report_save: true
+report_include_raw: false

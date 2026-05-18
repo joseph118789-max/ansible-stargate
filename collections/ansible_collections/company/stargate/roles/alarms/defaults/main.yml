@@ -1,0 +1,18 @@
+---
+# defaults file for alarms role
+
+stargate_server: "https://localhost:9443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+
+alarm_operation: list
+alarm_id: ""
+alarm_status: ""
+alarm_severity: ""
+
+alarm_export: false
+alarm_export_path: "/tmp/alarms.json"
+alarm_export_mode: "0644"
+alarm_export_data: "{{ alarm_list_result.alarms }}"

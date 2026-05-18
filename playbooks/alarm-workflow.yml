@@ -1,0 +1,42 @@
+---
+# Sample playbook: Stargate Alarm Workflow
+- name: Stargate NOC Alarm Workflow
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://pms.tony.lab.ctc-g.com.my:9443"
+    stargate_username: "admin"
+    stargate_password: "password"
+    stargate_validate_certs: false
+
+  tasks:
+    - name: Login to Stargate
+      company.stargate.stargate_login:
+        server: "{{ stargate_server }}"
+        username: "{{ stargate_username }}"
+        password: "{{ stargate_password }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+      register: login_result
+
+    - name: Get all active alarms
+      company.stargate.stargate_alarm:
+        server: "{{ stargate_server }}"
+        token: "{{ login_result.token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        state: present
+      register: active_alarms
+
+    - name: Filter critical alarms
+      ansible.builtin.set_fact:
+        critical_alarms: "{{ active_alarms.alarms | json_query('[?severity==`CRITICAL`]') }}"
+
+    - name: Display alarm summary
+      ansible.builtin.debug:
+        msg: "Total: {{ active_alarms.alarms | length }} | Critical: {{ critical_alarms | length }}"
+
+    - name: Logout from Stargate
+      company.stargate.stargate_login:
+        server: "{{ stargate_server }}"
+        token: "{{ login_result.token }}"
+        state: absent
+      delegate_to: localhost

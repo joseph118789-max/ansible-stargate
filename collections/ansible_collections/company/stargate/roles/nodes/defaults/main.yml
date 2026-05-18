@@ -1,0 +1,18 @@
+---
+# defaults file for nodes role
+
+stargate_server: "https://localhost:9443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+
+node_operation: list
+node_id: ""
+node_status: ""
+node_site: ""
+node_labels: {}
+node_discover_ip: ""
+
+alarm_export: false
+alarm_export_path: "/tmp/nodes.json"

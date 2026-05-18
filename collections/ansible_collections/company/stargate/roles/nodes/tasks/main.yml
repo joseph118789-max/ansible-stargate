@@ -1,0 +1,100 @@
+---
+# tasks file for nodes role
+
+- name: Get all nodes
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+  register: node_list_result
+  when: node_operation | default('list') == 'list' and node_id is not defined
+
+- name: Get node by ID
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    node_id: "{{ node_id }}"
+  register: node_result
+  when: node_id is defined
+
+- name: Filter nodes by status
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    status: "{{ node_status }}"
+  register: filtered_nodes
+  when: node_operation | default('list') == 'list' and node_status is defined
+
+- name: Filter nodes by site
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    site: "{{ node_site }}"
+  register: filtered_nodes
+  when: node_operation | default('list') == 'list' and node_site is defined
+
+- name: Discover nodes on network
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    discover: true
+    ip_address: "{{ node_discover_ip | default(omit) }}"
+  register: discovered_nodes
+  when: node_operation == 'discover'
+
+- name: Set node to maintenance mode
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    node_id: "{{ node_id }}"
+    state: maintenance
+  register: maintenance_result
+  when: node_operation == 'maintenance' and node_id is defined
+
+- name: Update node labels
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    node_id: "{{ node_id }}"
+    labels: "{{ node_labels }}"
+  register: update_result
+  when: node_operation == 'update' and node_id is defined and node_labels is defined
+
+- name: Delete a node
+  company.stargate.stargate_node:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    node_id: "{{ node_id }}"
+    state: absent
+  register: delete_result
+  when: node_operation == 'delete' and node_id is defined
+
+- name: Set node facts for downstream tasks
+  ansible.builtin.set_fact:
+    nodes: "{{ node_list_result.nodes }}"
+    node_count: "{{ node_list_result.count }}"
+    target_node: "{{ node_result.node }}"
+  when: node_id is not defined

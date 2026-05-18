@@ -1,0 +1,121 @@
+---
+# tasks file for alarms role
+
+- name: Get all alarms
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+  register: alarm_list_result
+  when: alarm_operation | default('list') == 'list' and alarm_id is not defined
+
+- name: Get alarm by ID
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    alarm_id: "{{ alarm_id }}"
+  register: alarm_result
+  when: alarm_id is defined
+
+- name: Filter alarms by status
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    status: "{{ alarm_status }}"
+  register: filtered_alarms
+  when: alarm_operation | default('list') == 'list' and alarm_status is defined
+
+- name: Filter alarms by severity
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    severity: "{{ alarm_severity }}"
+  register: filtered_alarms
+  when: alarm_operation | default('list') == 'list' and alarm_severity is defined
+
+- name: Acknowledge an alarm
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    alarm_id: "{{ alarm_id }}"
+    acknowledge: true
+  register: ack_result
+  when: alarm_operation == 'acknowledge' and alarm_id is defined
+
+- name: Clear an alarm
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    alarm_id: "{{ alarm_id }}"
+    clear: true
+  register: clear_result
+  when: alarm_operation == 'clear' and alarm_id is defined
+
+- name: Acknowledge all alarms matching filters
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    severity: "{{ alarm_severity | default(omit) }}"
+    status: "{{ alarm_status | default(omit) }}"
+    acknowledge_all: true
+  register: bulk_ack_result
+  when: alarm_operation == 'acknowledge_all'
+
+- name: Clear all alarms matching filters
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    severity: "{{ alarm_severity | default(omit) }}"
+    status: "{{ alarm_status | default(omit) }}"
+    clear_all: true
+  register: bulk_clear_result
+  when: alarm_operation == 'clear_all'
+
+- name: Delete an alarm
+  company.stargate.stargate_alarm:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    alarm_id: "{{ alarm_id }}"
+    state: absent
+  register: delete_result
+  when: alarm_operation == 'delete' and alarm_id is defined
+
+- name: Export alarms to local file
+  ansible.builtin.copy:
+    content: "{{ alarm_export_data | to_nice_json }}"
+    dest: "{{ alarm_export_path }}"
+    mode: "{{ alarm_export_mode }}"
+  when: alarm_export | bool and alarm_export_path is defined
+
+- name: Set alarm facts for downstream tasks
+  ansible.builtin.set_fact:
+    alarms: "{{ alarm_list_result.alarms }}"
+    alarm_count: "{{ alarm_list_result.count }}"
+    latest_alarm: "{{ alarm_result.alarm }}"
+  when: alarm_id is not defined

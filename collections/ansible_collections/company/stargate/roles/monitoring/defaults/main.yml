@@ -1,0 +1,13 @@
+---
+# defaults file for monitoring role
+
+stargate_server: "https://localhost:9443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+
+monitor_critical_threshold: 1
+monitor_high_threshold: 10
+monitor_offline_node_threshold: 1
+monitor_verbose: true

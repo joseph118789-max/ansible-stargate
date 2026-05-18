@@ -1,0 +1,34 @@
+# Ansible
+*.retry
+*.log
+collections/ansible_collections/company/stargate/roles/*/tests/
+collections/ansible_collections/company/stargate/tests/**/molecule/**/*.molecule/
+.molecule/
+.pytest_cache/
+.coverage
+htmlcov/
+*.pyc
+__pycache__/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp
+tmp/
+temp/

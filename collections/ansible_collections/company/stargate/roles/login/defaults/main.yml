@@ -1,0 +1,11 @@
+---
+# defaults file for login role
+
+stargate_server: "https://localhost:9443"
+stargate_username: "admin"
+stargate_password: "admin"
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+stargate_token: ""
+stargate_force_login: false

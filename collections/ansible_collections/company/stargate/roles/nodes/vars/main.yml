@@ -1,0 +1,13 @@
+---
+# vars file for nodes role
+
+node_status_values:
+  - online
+  - offline
+  - maintenance
+  - active
+
+node_required_for_operations:
+  - maintenance
+  - update
+  - delete

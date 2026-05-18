@@ -1,0 +1,28 @@
+---
+# tasks file for login role
+
+- name: Login to Stargate and obtain token
+  company.stargate.stargate_login:
+    server: "{{ stargate_server }}"
+    username: "{{ stargate_username }}"
+    password: "{{ stargate_password }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    state: present
+  register: stargate_login_result
+  when: stargate_token is not defined or stargate_token | length == 0
+
+- name: Set stargate_token fact from login result
+  ansible.builtin.set_fact:
+    stargate_token: "{{ stargate_token | default(stargate_login_result.token) }}"
+  when: stargate_login_result is defined and stargate_login_result.token is defined
+
+- name: Validate token is available
+  ansible.builtin.assert:
+    that:
+      - stargate_token is defined
+      - stargate_token | length > 0
+    fail_msg: "Failed to obtain Stargate authentication token"
+    success_msg: "Successfully authenticated with Stargate API"
+  when: stargate_force_login | bool or stargate_token is not defined

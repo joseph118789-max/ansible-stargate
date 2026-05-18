@@ -1,0 +1,16 @@
+---
+# vars file for services role
+
+service_status_values:
+  - running
+  - stopped
+  - failed
+  - unknown
+
+service_type_values:
+  - http
+  - tcp
+  - mysql
+  - redis
+  - mongodb
+  - custom

@@ -1,0 +1,89 @@
+---
+# tasks file for backup role
+
+- name: Get current configuration for backup
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/config"
+  register: config_result
+  when: backup_include_config | bool
+
+- name: Backup all alarms
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/alarms"
+    params:
+      status: active
+      include_history: "{{ backup_include_history | string }}"
+  register: alarms_backup
+  when: backup_include_alarms | bool
+
+- name: Backup all nodes
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/nodes"
+  register: nodes_backup
+  when: backup_include_nodes | bool
+
+- name: Backup all services
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/services"
+  register: services_backup
+  when: backup_include_services | bool
+
+- name: Trigger API-based backup
+  company.stargate.stargate_post:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/backup"
+    data:
+      description: "{{ backup_description }}"
+      include_nodes: "{{ backup_include_nodes }}"
+      include_services: "{{ backup_include_services }}"
+      include_alarms: "{{ backup_include_alarms }}"
+  register: api_backup_result
+  when: backup_trigger_api | bool
+
+- name: Build backup manifest
+  ansible.builtin.set_fact:
+    backup_manifest:
+      timestamp: "{{ ansible_date_time.iso8601 }}"
+      server: "{{ stargate_server }}"
+      version: "{{ stargate_version }}"
+      config: "{{ config_result.data if backup_include_config | bool else {} }}"
+      alarms: "{{ alarms_backup.data if backup_include_alarms | bool else [] }}"
+      nodes: "{{ nodes_backup.data if backup_include_nodes | bool else [] }}"
+      services: "{{ services_backup.data if backup_include_services | bool else [] }}"
+      api_backup: "{{ api_backup_result.data if backup_trigger_api | bool else {} }}"
+
+- name: Save backup to local file
+  ansible.builtin.copy:
+    content: "{{ backup_manifest | to_nice_json }}"
+    dest: "{{ backup_dest_path }}/stargate_backup_{{ ansible_date_time.epoch }}.json"
+    mode: "{{ backup_file_mode }}"
+  when: backup_save_local | bool
+
+- name: Set backup facts
+  ansible.builtin.set_fact:
+    backup_timestamp: "{{ ansible_date_time.iso8601 }}"
+    backup_path: "{{ backup_dest_path }}/stargate_backup_{{ ansible_date_time.epoch }}.json"

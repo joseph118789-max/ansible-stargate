@@ -1,0 +1,9 @@
+---
+# vars file for monitoring role
+
+monitor_severity_levels:
+  critical: 1
+  high: 2
+  medium: 3
+  low: 4
+  info: 5

@@ -1,0 +1,85 @@
+---
+# tasks file for monitoring role
+
+- name: Fetch current alarm summary
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/alarms"
+    params:
+      status: active
+  register: current_alarms
+
+- name: Fetch current node status
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/nodes"
+  register: current_nodes
+
+- name: Fetch current service status
+  company.stargate.stargate_get:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    endpoint: "/api/services"
+  register: current_services
+
+- name: Count critical alarms
+  ansible.builtin.set_fact:
+    critical_count: "{{ (current_alarms.data | selectattr('severity', 'equalto', 'critical') | list | length) if current_alarms.data is iterable else 0 }}"
+
+- name: Count high-severity alarms
+  ansible.builtin.set_fact:
+    high_count: "{{ (current_alarms.data | selectattr('severity', 'equalto', 'high') | list | length) if current_alarms.data is iterable else 0 }}"
+
+- name: Count online nodes
+  ansible.builtin.set_fact:
+    online_nodes: "{{ (current_nodes.data | selectattr('status', 'equalto', 'online') | list | length) if current_nodes.data is iterable else 0 }}"
+
+- name: Count running services
+  ansible.builtin.set_fact:
+    running_services: "{{ (current_services.data | selectattr('status', 'equalto', 'running') | list | length) if current_services.data is iterable else 0 }}"
+
+- name: Aggregate monitoring metrics
+  ansible.builtin.set_fact:
+    monitoring_metrics:
+      timestamp: "{{ ansible_date_time.iso8601 }}"
+      total_active_alarms: "{{ current_alarms.data | length if current_alarms.data is iterable else 0 }}"
+      critical_alarms: "{{ critical_count }}"
+      high_alarms: "{{ high_count }}"
+      total_nodes: "{{ current_nodes.data | length if current_nodes.data is iterable else 0 }}"
+      online_nodes: "{{ online_nodes }}"
+      total_services: "{{ current_services.data | length if current_services.data is iterable else 0 }}"
+      running_services: "{{ running_services }}"
+
+- name: Check thresholds and set alert flags
+  ansible.builtin.set_fact:
+    alert_critical_alarms: "{{ critical_count >= monitor_critical_threshold }}"
+    alert_high_alarms: "{{ high_count >= monitor_high_threshold }}"
+    alert_nodes_offline: "{{ (current_nodes.data | length - online_nodes) >= monitor_offline_node_threshold }}"
+
+- name: Fail if critical alarm threshold exceeded
+  ansible.builtin.fail:
+    msg: "Critical alarm count {{ critical_count }} exceeds threshold {{ monitor_critical_threshold }}"
+  when: alert_critical_alarms | bool
+
+- name: Display monitoring summary
+  ansible.builtin.debug:
+    msg: |
+      Stargate Monitoring Summary
+      ===========================
+      Active Alarms: {{ monitoring_metrics.total_active_alarms }}
+        - Critical: {{ monitoring_metrics.critical_alarms }}
+        - High: {{ monitoring_metrics.high_alarms }}
+      Nodes: {{ monitoring_metrics.online_nodes }}/{{ monitoring_metrics.total_nodes }} online
+      Services: {{ monitoring_metrics.running_services }}/{{ monitoring_metrics.total_services }} running
+  when: monitor_verbose | bool

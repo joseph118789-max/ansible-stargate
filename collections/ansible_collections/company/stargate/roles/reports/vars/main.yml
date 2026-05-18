@@ -1,0 +1,8 @@
+---
+# vars file for reports role
+
+report_types:
+  - alarms
+  - nodes
+  - services
+  - full

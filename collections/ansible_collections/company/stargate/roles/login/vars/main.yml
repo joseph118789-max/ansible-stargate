@@ -1,0 +1,5 @@
+---
+# vars file for login role
+
+stargate_api_version: "11.7.0"
+stargate_token_name: "stargate_token"

@@ -1,0 +1,21 @@
+---
+# defaults file for backup role
+
+stargate_server: "https://localhost:9443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+stargate_version: "11.7.0"
+
+backup_dest_path: "/var/backups/stargate"
+backup_file_mode: "0600"
+backup_description: "Manual Ansible backup"
+
+backup_include_config: true
+backup_include_nodes: true
+backup_include_services: true
+backup_include_alarms: true
+backup_include_history: false
+backup_save_local: true
+backup_trigger_api: false
