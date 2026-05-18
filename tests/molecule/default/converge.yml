@@ -1,0 +1,48 @@
+# Copyright (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+---
+- name: Converge stargate collection
+  hosts: all
+  gather_facts: no
+
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+  tasks:
+    - name: Ensure Python dependencies are available
+      pip:
+        name:
+          - pyyaml
+          - requests
+        state: present
+
+    - name: Verify collection structure
+      assert:
+        that:
+          - lookup('file', '~/.ansible/collections/ansible_collections/company/stargate/README.md') != ''
+        fail_msg: "Collection not found in expected location"
+        success_msg: "Stargate collection found"
+
+    - name: Include stargate_utils tests verification
+      import_role:
+        name: company.stargate.stargate_utils
+      vars:
+        test_mode: true
+      ignore_errors: yes
+
+    - name: Create a minimal test inventory for validation
+      add_host:
+        name: stargate-test
+        ansible_host: localhost
+        ansible_connection: local
+
+    - name: Validate stargate modules are available
+      assert:
+        that:
+          - "'stargate_login' in lookup('namespace', 'company.stargate')"
+        fail_msg: "stargate_login module not found in collection"
+
+    - name: Print collection info
+      debug:
+        msg: "Stargate collection molecule converge completed successfully"

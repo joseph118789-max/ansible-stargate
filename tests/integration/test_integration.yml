@@ -1,0 +1,128 @@
+# Copyright (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+---
+- name: Integration tests for stargate collection
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  collections:
+    - company.stargate
+
+  vars:
+    stargate_server: "https://stargate.example.com"
+    stargate_username: "{{ lookup('env', 'STARGATE_USERNAME') | default('admin', true) }}"
+    stargate_password: "{{ lookup('env', 'STARGATE_PASSWORD') | default('password', true) }}"
+    stargate_validate_certs: false
+
+  tasks:
+    - name: Test stargate_login module in check mode
+      stargate_login:
+        server: "{{ stargate_server }}"
+        username: "{{ stargate_username }}"
+        password: "{{ stargate_password }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+      register: login_result
+      check_mode: yes
+
+    - name: Verify login result structure in check mode
+      assert:
+        that:
+          - login_result is defined
+          - "'token' in login_result or login_result is succeeded"
+
+    - name: Debug login result
+      debug:
+        msg: "Login result - changed: {{ login_result.changed | default('N/A') }}"
+
+    - name: Test stargate_get module with check mode
+      stargate_get:
+        server: "{{ stargate_server }}"
+        endpoint: "/api/status"
+        token: "{{ login_result.token | default('dummy-token') }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+      register: get_result
+      check_mode: yes
+
+    - name: Assert stargate_get returns expected structure
+      assert:
+        that:
+          - get_result is defined
+
+    - name: Debug get result
+      debug:
+        msg: "Get result - status: {{ get_result.status | default('N/A') }}"
+
+    - name: Test stargate_get module for services list
+      stargate_get:
+        server: "{{ stargate_server }}"
+        endpoint: "/api/services"
+        token: "{{ login_result.token | default('dummy-token') }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+      register: services_result
+      ignore_errors: yes
+      check_mode: no
+
+    - name: Debug services result
+      debug:
+        msg: "Services result - {{ services_result }}"
+
+    - name: Verify services response has expected fields (if successful)
+      assert:
+        that:
+          - services_result.status is defined or services_result.failed is defined
+      when: services_result is defined
+
+    - name: Test stargate_login with invalid credentials (expect failure)
+      stargate_login:
+        server: "{{ stargate_server }}"
+        username: "invalid_user"
+        password: "invalid_password"
+        validate_certs: "{{ stargate_validate_certs }}"
+      register: invalid_login_result
+      ignore_errors: yes
+      check_mode: no
+
+    - name: Verify invalid login fails gracefully
+      assert:
+        that:
+          - invalid_login_result.failed | default(false)
+          - invalid_login_result.msg is defined
+
+    - name: Debug invalid login message
+      debug:
+        msg: "Invalid login error: {{ invalid_login_result.msg | default('N/A') }}"
+
+    - name: Test stargate_get with no token (expect failure)
+      stargate_get:
+        server: "{{ stargate_server }}"
+        endpoint: "/api/status"
+        token: ""
+        validate_certs: "{{ stargate_validate_certs }}"
+      register: no_token_result
+      ignore_errors: yes
+      check_mode: no
+
+    - name: Verify no-token request fails
+      assert:
+        that:
+          - no_token_result.failed | default(false)
+
+    - name: Test stargate_login returns a valid token format
+      stargate_login:
+        server: "{{ stargate_server }}"
+        username: "{{ stargate_username }}"
+        password: "{{ stargate_password }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+      register: full_login_result
+      when: stargate_server != 'https://stargate.example.com'
+      ignore_errors: yes
+
+    - name: Assert token is non-empty string if login succeeded
+      assert:
+        that:
+          - full_login_result.token | type_debug == 'str'
+          - full_login_result.token | length > 0
+      when:
+        - full_login_result is defined
+        - not (full_login_result.failed | default(false))

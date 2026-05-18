@@ -1,0 +1,28 @@
+---
+ molecule_scenario:
+  name: default
+
+driver:
+  name: docker
+
+platforms:
+  - name: ansible-stargate-test
+    image: registry.access.redhat.com/ubi8/ansible:latest
+    pre_build_image: true
+    command: sleep 0
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+provisioner:
+  name: ansible
+  inventory:
+    hosts:
+      all:
+        hosts:
+          localhost:
+            ansible_connection: local
+            ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+verifier:
+  name: ansible
