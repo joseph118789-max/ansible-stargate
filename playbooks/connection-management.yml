@@ -1,0 +1,72 @@
+---
+# Playbook: Connection Management
+# Lists connections, counts them, and retrieves connection details
+- name: Stargate Connection Management
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stargate_validate_certs: false
+
+  tasks:
+    # List all connections with pagination
+    - name: List all connections
+      company.stargate.stargate_connection:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: connectionGet
+        start: 0
+        length: 100
+      register: connections_result
+
+    - name: Display connections inventory
+      ansible.builtin.debug:
+        msg:
+          - "=== Connection Inventory ==="
+          - "Total connections found: {{ connections_result.connection | length if connections_result.connection is list else 0 }}"
+
+    # Count all connections
+    - name: Count total connections
+      company.stargate.stargate_connection:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: connectionCount
+      register: connection_count_result
+
+    - name: Display connection count
+      ansible.builtin.debug:
+        msg: "Total connection count: {{ connection_count_result.connection }}"
+
+    # Get detailed information for each connection
+    - name: Get connection details
+      when: connections_result.connection is defined and connections_result.connection is iterable
+      block:
+        - name: Show connection details
+          ansible.builtin.debug:
+            msg: "Connection details: {{ item }}"
+          loop: "{{ connections_result.connection }}"
+          when: connections_result.connection is defined and connections_result.connection is iterable
+
+        - name: Build connection inventory table
+          ansible.builtin.set_fact:
+            connection_inventory:
+              - "Name: {{ item.name | default('N/A') }}"
+              - "Type: {{ item.type | default('N/A') }}"
+              - "Host: {{ item.host | default('N/A') }}"
+              - "Port: {{ item.port | default('N/A') }}"
+              - "Status: {{ item.status | default('N/A') }}"
+          loop: "{{ connections_result.connection }}"
+          when: connections_result.connection is iterable
+          register: inventory_items
+
+    # Summary report
+    - name: Display connection summary
+      ansible.builtin.debug:
+        msg:
+          - "=== Connection Management Summary ==="
+          - "Total connections: {{ connection_count_result.connection }}"
+          - "Connections retrieved: {{ connections_result.connection | length if connections_result.connection is list else 0 }}"
+          - "All connection operations completed successfully"

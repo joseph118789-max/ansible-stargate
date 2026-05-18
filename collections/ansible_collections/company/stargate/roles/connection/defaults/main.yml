@@ -1,0 +1,18 @@
+---
+# defaults file for connection role
+
+stargate_server: "https://10.201.208.160:8443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+
+connection_operation: get
+connection_start: 0
+connection_length: 10
+connection_data: {}
+
+connections: []
+connection_count: 0
+created_connection: {}
+deleted_connection: {}

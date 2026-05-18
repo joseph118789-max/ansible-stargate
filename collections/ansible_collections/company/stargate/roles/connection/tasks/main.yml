@@ -1,0 +1,58 @@
+---
+# tasks file for connection role
+
+- name: Get connections (with pagination)
+  company.stargate.stargate_connection:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: connectionGet
+    start: "{{ connection_start | default(0) }}"
+    length: "{{ connection_length | default(10) }}"
+  register: connection_get_result
+  when: connection_operation | default('get') == 'get'
+
+- name: Count all connections
+  company.stargate.stargate_connection:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: connectionCount
+  register: connection_count_result
+  when: connection_operation | default('get') == 'count'
+
+- name: Create a new connection
+  company.stargate.stargate_connection:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: connectionCreate
+    connection_data: "{{ connection_data | default({}) }}"
+  register: connection_create_result
+  when: connection_operation | default('get') == 'create'
+
+- name: Delete a connection
+  company.stargate.stargate_connection:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: connectionDelete
+    connection_data: "{{ connection_data | default({}) }}"
+  register: connection_delete_result
+  when: connection_operation | default('get') == 'delete'
+
+- name: Set connection facts for downstream tasks
+  ansible.builtin.set_fact:
+    connections: "{{ connection_get_result.connection }}"
+    connection_count: "{{ connection_count_result.connection | default(0) }}"
+    created_connection: "{{ connection_create_result.connection }}"
+    deleted_connection: "{{ connection_delete_result.connection }}"
+  when: connection_operation | default('get') != 'get'

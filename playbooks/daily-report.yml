@@ -1,0 +1,116 @@
+---
+# Playbook: Daily Report
+# Collects and summarizes all Stargate resources
+- name: Stargate Daily Report
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stargate_validate_certs: false
+
+  tasks:
+    # Get user count
+    - name: Get user count
+      company.stargate.stargate_user:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: userCount
+      register: user_count
+
+    # Get all users
+    - name: Get all users
+      company.stargate.stargate_user:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: userGet
+        start: 0
+        length: 100
+      register: all_users
+
+    # Get connection count
+    - name: Get connection count
+      company.stargate.stargate_connection:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: connectionCount
+      register: connection_count
+
+    # Get all connections
+    - name: Get all connections
+      company.stargate.stargate_connection:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: connectionGet
+        start: 0
+        length: 100
+      register: all_connections
+
+    # Get all accounts
+    - name: Get all accounts
+      company.stargate.stargate_account:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: accountCommonGet
+        start: 0
+        length: 100
+      register: all_accounts
+
+    # Compile and display daily report
+    - name: Display daily report header
+      ansible.builtin.debug:
+        msg: "==========================================="
+      changed_when: false
+
+    - name: Display daily report
+      ansible.builtin.debug:
+        msg:
+          - "=== STARGATE DAILY REPORT ==="
+          - "Generated: {{ ansible_date_time.iso8601 }}"
+          - "==========================================="
+          - ""
+          - "USER SUMMARY"
+          - "----------"
+          - "Total Users: {{ user_count.user }}"
+          - "Active Users: {{ all_users.user | length if all_users.user is iterable else 0 }}"
+          - ""
+          - "CONNECTION SUMMARY"
+          - "------------------"
+          - "Total Connections: {{ connection_count.connection }}"
+          - "Active Connections: {{ all_connections.connection | length if all_connections.connection is iterable else 0 }}"
+          - ""
+          - "ACCOUNT SUMMARY"
+          - "---------------"
+          - "Total Accounts: {{ all_accounts.account | length if all_accounts.account is iterable else 0 }}"
+          - ""
+          - "==========================================="
+          - "Report completed successfully"
+          - "==========================================="
+
+    # Save report to file (optional)
+    - name: Save report to file
+      ansible.builtin.copy:
+        content: |
+          STARGATE DAILY REPORT
+          Generated: {{ ansible_date_time.iso8601 }}
+          
+          USER SUMMARY
+          Total Users: {{ user_count.user }}
+          Active Users: {{ all_users.user | length if all_users.user is iterable else 0 }}
+          
+          CONNECTION SUMMARY
+          Total Connections: {{ connection_count.connection }}
+          Active Connections: {{ all_connections.connection | length if all_connections.connection is iterable else 0 }}
+          
+          ACCOUNT SUMMARY
+          Total Accounts: {{ all_accounts.account | length if all_accounts.account is iterable else 0 }}
+          
+          Report completed successfully
+        dest: "/tmp/stargate-daily-report-{{ ansible_date_time.year }}-{{ ansible_date_time.month }}-{{ ansible_date_time.day }}.txt"
+        mode: '0644'
+      changed_when: true

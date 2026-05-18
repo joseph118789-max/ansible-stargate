@@ -1,0 +1,26 @@
+---
+# meta file for user role
+
+galaxy_info:
+  author: Company Automation Team
+  description: Manage Stargate user operations (get, count, create, update, delete)
+  company: Company Automation
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+  galaxy_tags:
+    - stargate
+    - user
+    - api
+    - identity
+dependencies:
+  - role: company.stargate.login
+    when: stargate_token | length == 0

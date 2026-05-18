@@ -1,0 +1,19 @@
+---
+# defaults file for user role
+
+stargate_server: "https://10.201.208.160:8443"
+stargate_token: ""
+stargate_validate_certs: false
+stargate_use_ssl: true
+stargate_timeout: 30
+
+user_operation: get
+user_start: 0
+user_length: 10
+user_data: {}
+
+users: []
+user_count: 0
+created_user: {}
+updated_user: {}
+deleted_user: {}

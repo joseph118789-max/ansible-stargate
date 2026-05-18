@@ -1,0 +1,92 @@
+---
+# Playbook: User Management
+# Demonstrates all user operations: get, count, create, delete
+- name: Stargate User Management
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stargate_validate_certs: false
+
+  tasks:
+    # Get all users with pagination
+    - name: Get all users (paginated)
+      company.stargate.stargate_user:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: userGet
+        start: 0
+        length: 100
+      register: users_result
+
+    - name: Display users list
+      ansible.builtin.debug:
+        msg: "Users retrieved: {{ users_result.user | length }} records"
+
+    # Count all users
+    - name: Count total users
+      company.stargate.stargate_user:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: userCount
+      register: user_count_result
+
+    - name: Display user count
+      ansible.builtin.debug:
+        msg: "Total user count: {{ user_count_result.user }}"
+
+    # Create a test user
+    - name: Create test user
+      company.stargate.stargate_user:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: userCreate
+        user_data:
+          name: "ansible_test_user"
+          password: "TestPass123!"
+          enabled: true
+          description: "Test user created by Ansible playbook"
+      register: create_user_result
+
+    - name: Display created user result
+      ansible.builtin.debug:
+        msg: "User creation result: {{ create_user_result.msg }}"
+      when: create_user_result.changed
+
+    # Delete the test user
+    - name: Delete test user
+      company.stargate.stargate_user:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: userDelete
+        user_data:
+          name: "ansible_test_user"
+      register: delete_user_result
+      when: create_user_result.changed
+
+    - name: Display delete result
+      ansible.builtin.debug:
+        msg: "User deletion result: {{ delete_user_result.msg }}"
+      when: delete_user_result.changed is defined
+
+    # Final user count after operations
+    - name: Final user count
+      company.stargate.stargate_user:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: userCount
+      register: final_user_count
+
+    - name: Display final summary
+      ansible.builtin.debug:
+        msg:
+          - "=== User Management Summary ==="
+          - "Initial user count: {{ user_count_result.user }}"
+          - "Final user count: {{ final_user_count.user }}"
+          - "Test user created and deleted successfully"

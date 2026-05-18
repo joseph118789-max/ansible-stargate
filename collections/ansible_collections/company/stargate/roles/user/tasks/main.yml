@@ -1,0 +1,71 @@
+---
+# tasks file for user role
+
+- name: Get users (with pagination)
+  company.stargate.stargate_user:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: userGet
+    start: "{{ user_start | default(0) }}"
+    length: "{{ user_length | default(10) }}"
+  register: user_get_result
+  when: user_operation | default('get') == 'get'
+
+- name: Count all users
+  company.stargate.stargate_user:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: userCount
+  register: user_count_result
+  when: user_operation | default('get') == 'count'
+
+- name: Create a new user
+  company.stargate.stargate_user:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: userCreate
+    user_data: "{{ user_data | default({}) }}"
+  register: user_create_result
+  when: user_operation | default('get') == 'create'
+
+- name: Update an existing user
+  company.stargate.stargate_user:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: userUpdate
+    user_data: "{{ user_data | default({}) }}"
+  register: user_update_result
+  when: user_operation | default('get') == 'update'
+
+- name: Delete a user
+  company.stargate.stargate_user:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: userDelete
+    user_data: "{{ user_data | default({}) }}"
+  register: user_delete_result
+  when: user_operation | default('get') == 'delete'
+
+- name: Set user facts for downstream tasks
+  ansible.builtin.set_fact:
+    users: "{{ user_get_result.user }}"
+    user_count: "{{ user_count_result.user | default(0) }}"
+    created_user: "{{ user_create_result.user }}"
+    updated_user: "{{ user_update_result.user }}"
+    deleted_user: "{{ user_delete_result.user }}"
+  when: user_operation | default('get') != 'get'

@@ -1,0 +1,46 @@
+---
+# tasks file for account role
+
+- name: Get accounts (with pagination)
+  company.stargate.stargate_account:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: accountCommonGet
+    start: "{{ account_start | default(0) }}"
+    length: "{{ account_length | default(10) }}"
+  register: account_get_result
+  when: account_operation | default('get') == 'get'
+
+- name: Create a new account
+  company.stargate.stargate_account:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: accountCreate
+    account_data: "{{ account_data | default({}) }}"
+  register: account_create_result
+  when: account_operation | default('get') == 'create'
+
+- name: Get account password
+  company.stargate.stargate_account:
+    server: "{{ stargate_server }}"
+    token: "{{ stargate_token }}"
+    validate_certs: "{{ stargate_validate_certs }}"
+    use_ssl: "{{ stargate_use_ssl }}"
+    timeout: "{{ stargate_timeout }}"
+    operation: accountPasswordGet
+    account_data: "{{ account_data | default({}) }}"
+  register: account_password_result
+  when: account_operation | default('get') == 'get_password'
+
+- name: Set account facts for downstream tasks
+  ansible.builtin.set_fact:
+    accounts: "{{ account_get_result.account }}"
+    created_account: "{{ account_create_result.account }}"
+    account_password: "{{ account_password_result.account }}"
+  when: account_operation | default('get') != 'get'

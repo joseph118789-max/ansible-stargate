@@ -1,0 +1,24 @@
+---
+# meta file for login role
+
+galaxy_info:
+  author: Company Automation Team
+  description: Authenticate with Stargate REST API and prepare token for downstream tasks
+  company: Company Automation
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.9"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+  galaxy_tags:
+    - stargate
+    - api
+    - authentication
+    - login
+dependencies: []
