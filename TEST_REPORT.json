@@ -1,0 +1,81 @@
+{
+  "test_date": "2026-05-18",
+  "server": "https://10.201.208.160:8443",
+  "auth": "ansible:d147ef1f-896d-487c-833e-28154903afc5",
+  "total_endpoints_tested": 44,
+  "results": {
+    "passed": 13,
+    "not_found_404": 19,
+    "bad_request_400": 4,
+    "server_error_500": 8
+  },
+  "working_endpoints": [
+    "userGet",
+    "userCount",
+    "userCommonGet",
+    "userGroupGet",
+    "accountCommonGet",
+    "connectionGet",
+    "connectionCount",
+    "connectionAuthorizationGet",
+    "connectionGroupGet",
+    "approvedConnectionGet",
+    "approvedConnectionCount",
+    "userGroupCreate",
+    "connectionGroupCreate"
+  ],
+  "not_found_endpoints": [
+    "userLastLoginGet",
+    "userMonitoringGet",
+    "connectionMonitoringGet",
+    "resourceGet",
+    "resourceCount",
+    "alarmGet",
+    "alarmCount",
+    "nodeGet",
+    "nodeCount",
+    "serviceStatusGet",
+    "backupGet",
+    "reportsGet",
+    "userAllGet",
+    "accountGet",
+    "accountAllGet",
+    "connectionAllGet",
+    "alarmHistoryGet",
+    "alarmHistoryCount",
+    "nodeHistoryGet",
+    "nodeHistoryCount",
+    "nodeAlertGet",
+    "nodeAlertCount",
+    "licenseGet",
+    "licenseCount",
+    "systemInfoGet",
+    "auditTrailGet",
+    "auditTrailCount",
+    "resourceGroupGet",
+    "resourceGroupCount",
+    "accountPasswordReset",
+    "accountPasswordVerify"
+  ],
+  "server_error_endpoints": [
+    "userCreate",
+    "accountCreate",
+    "connectionCreate",
+    "resourceUnixCreate",
+    "resourceWindowsCreate",
+    "resourceOracleCreate",
+    "userDelete",
+    "connectionDelete",
+    "approvedConnectionCreate"
+  ],
+  "bad_request_endpoints": [
+    "accountWorkflowProfileGet",
+    "accountDelete",
+    "connectionDeleteAll",
+    "accountPasswordGet"
+  ],
+  "root_cause_analysis": {
+    "500_errors": "Server-side Java bugs - SshKeyPolicyService.retrieveByName() and similar methods call name.toLowerCase() on null. Requires Java source fix.",
+    "404_errors": "Endpoints not implemented in this API version (11.7.0) or require different module/component enabled"
+  }
+}
