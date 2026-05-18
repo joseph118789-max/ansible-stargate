@@ -1,131 +1,135 @@
-# Stargate REST API 11.7.0 - Complete Test Results
+# Stargate REST API 11.7.0 - Complete Test Results (75 Endpoints)
 
 **Server:** `https://10.201.208.160:8443`
 **Auth:** `Authorization: Bearer <base64("ansible:d147ef1f-896d-487c-833e-28154903afc5")>`
-**Tested:** 2026-05-18
+**Test Date:** 2026-05-18
 
 ## Summary
 | Status | Count |
 |--------|-------|
-| ✅ Working (200) | 17 |
-| ❌ Failed | 58 |
+| ✅ Working | **19** |
+| ❌ Failed | **56** |
 | **Total** | **75** |
 
 ---
 
-## ✅ WORKING Endpoints (17)
+## ✅ WORKING Endpoints (19)
 
-| Endpoint | Method | Test Data | Notes |
-|----------|--------|-----------|-------|
-| `accountCommonGet` | POST | `{"start": 0, "length": 10}` | |
-| `accountWorkflowProfileGet` | POST | `{"start": 0, "length": 10}` | |
-| `approvedConnectionCount` | POST | `{}` | |
-| `approvedConnectionGet` | POST | `{"start": 0, "length": 10}` | |
-| `connectionAuthorizationGet` | POST | `{"start": 0, "length": 10}` | |
-| `connectionCount` | POST | `{}` | |
-| `connectionDeleteAll` | POST | `{}` | |
-| `connectionGet` | POST | `{"start": 0, "length": 10}` | |
-| `connectionMonitoringCount` | POST | `{}` | |
-| `connectionGroupGet` | POST | `{"start": 0, "length": 10}` | |
-| `userCount` | POST | `{}` | |
-| `userGet` | POST | `{"start": 0, "length": 10}` | |
-| `userGetLastLogin` | POST | `{"userId": "1"}` | |
-| `userMonitoringCount` | POST | `{}` | |
-| `userCommonGet` | POST | `{"start": 0, "length": 10}` | |
-| `userGroupGet` | POST | `{"start": 0, "length": 10}` | |
-| `userUserGroupGet` | POST | `{"start": 0, "length": 10}` | |
+| Endpoint | Method | Test Data |
+|----------|--------|-----------|
+| `accountCommonGet` | POST | `{"start": 0, "length": 10}` |
+| `accountWorkflowProfileGet` | POST | `{"start": 0, "length": 10}` |
+| `approvedConnectionCount` | POST | `{}` |
+| `approvedConnectionGet` | POST | `{"start": 0, "length": 10}` |
+| `connectionAuthorizationGet` | POST | `{"start": 0, "length": 10}` |
+| `connectionCount` | POST | `{}` |
+| `connectionDelete` | POST | `{"id": "<id>"}` |
+| `connectionDeleteAll` | POST | `{}` |
+| `connectionGet` | POST | `{"start": 0, "length": 10}` |
+| `connectionMonitoringCount` | POST | `{}` |
+| `connectionGroupCreate` | POST | `{"name": "api-conn-grp"}` |
+| `connectionGroupGet` | POST | `{"start": 0, "length": 10}` |
+| `userCount` | POST | `{}` |
+| `userGet` | POST | `{"start": 0, "length": 10}` |
+| `userMonitoringCount` | POST | `{}` |
+| `userCommonGet` | POST | `{"start": 0, "length": 10}` |
+| `userGroupCreate` | POST | `{"name": "api-ug"}` |
+| `userGroupGet` | POST | `{"start": 0, "length": 10}` |
+| `userUserGroupGet` | POST | `{"start": 0, "length": 10}` |
 
 ---
 
-## ❌ FAILED Endpoints (58)
+## ❌ FAILED Endpoints (56)
 
-### Category: Account (11)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
-| `accountCreate` | 500 HTML | Missing required fields (resource_type, etc.) |
-| `accountDelete` | "Invalid account" | Needs valid account ID |
-| `accountGetByName` | "Invalid account" | Account name not found |
-| `accountInsecurePasswordGet` | "Invalid account" | Needs valid account ID |
-| `accountKeyCreate` | "Iv Parameter is null" | Missing IV parameter |
-| `accountKeyGet` | "Invalid account" | Needs valid account ID |
-| `accountPasswordGet` | "Invalid account" | Needs valid account ID |
+### Account (13)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
+| `accountCreate` | 500 HTML | Missing required fields |
+| `accountDelete` | "Invalid account" | Account not found by name |
+| `accountGetByName` | "Invalid account" | Account not found by name |
+| `accountInsecurePasswordGet` | "Invalid account" | Permission issue |
+| `accountKeyCreate` | "Iv Parameter is null" | Missing IV param |
+| `accountKeyGet` | "Invalid account" | Permission issue |
+| `accountPasswordGet` | "Invalid account" | Permission issue |
 | `accountPasswordPlainCreate` | "Account is not exist" | Needs valid account ID |
 | `accountUpdate` | "Account is not exist" | Needs valid account ID |
 | `accountSettingProfileCreate` | 500 HTML | Missing required fields |
-| `accountSettingProfileDelete` | 500 HTML | Needs valid profile ID |
-| `accountSettingProfileUpdate` | 500 HTML | Needs valid profile ID |
+| `accountSettingProfileDelete` | 500 HTML | Needs valid ID |
+| `accountSettingProfileUpdate` | 500 HTML | Needs valid ID |
 | `accountWorkflowProfileCreate` | 500 HTML | Missing required fields |
-| `accountWorkflowProfileDelete` | 500 HTML | Needs valid profile ID |
-| `accountWorkflowProfileUpdate` | "error when updating" | Needs valid profile ID |
+| `accountWorkflowProfileDelete` | 500 HTML | Needs valid ID |
+| `accountWorkflowProfileUpdate` | "error when updating" | Needs valid ID |
 
-### Category: Approved Connection (2)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
-| `approvedConnectionCreate` | 500 HTML | Missing userId or connectionId |
+### Approved Connection (2)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
+| `approvedConnectionCreate` | 500 HTML | Missing required fields |
 | `approvedConnectionDelete` | 500 HTML | Needs valid ID |
 
-### Category: Connection (6)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
-| `connectionCreate` | "connection name" | Missing name field |
-| `connectionDelete` | 500 HTML | Needs valid connection ID |
-| `connectionExport` | 500 HTML | Missing required params |
-| `connectionPasswordGet` | "connection not exist" | Connection needs to be approved first |
-| `connectionPasswordReset` | 500 HTML | Needs valid connection ID |
-| `connectionAuthorizationConnectionGroupAdd` | 500 HTML | Missing required fields |
-| `connectionAuthorizationCreate` | 500 HTML | Missing required fields |
+### Connection (6)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
+| `connectionCreate` | 500 HTML | Missing required fields |
+| `connectionExport` | 500 HTML | Missing required fields |
+| `connectionPasswordGet` | "connection not exist" | Permission issue |
+| `connectionPasswordReset` | 500 HTML | Needs valid ID |
+| `connectionAuthorizationConnectionGroupAdd` | 500 HTML | Missing fields |
+| `connectionAuthorizationCreate` | 500 HTML | Missing fields |
 | `connectionAuthorizationDelete` | "Connection Authorization" | Needs valid ID |
-| `connectionAuthorizationRemoveConnectionGroups` | 500 HTML | Missing required fields |
-| `connectionAuthorizationRemoveUserGroups` | 500 HTML | Missing required fields |
-| `connectionAuthorizationUserGroupAdd` | 500 HTML | Missing required fields |
+| `connectionAuthorizationRemoveConnectionGroups` | 500 HTML | Missing fields |
+| `connectionAuthorizationRemoveUserGroups` | 500 HTML | Missing fields |
+| `connectionAuthorizationUserGroupAdd` | 500 HTML | Missing fields |
 
-### Category: Connection Group (3)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
-| `connectionGroupCreate` | 500 HTML | Missing required fields |
-| `connectionGroupDelete` | 500 HTML | Needs valid group ID |
-| `connectionGroupUpdate` | 500 HTML | Needs valid group ID |
+### Connection Group (2)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
+| `connectionGroupDelete` | "None" | Needs valid group ID |
+| `connectionGroupUpdate` | "connection group id does not exists" | Needs valid group ID |
 
-### Category: Request/Workflow (4)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
-| `accountRequestApproveEmail` | "None" | Request ID is null |
+### Request/Workflow (4)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
+| `accountRequestApproveEmail` | "None" | Request ID null |
 | `approveRequest` | "Request Id cannot be null" | Missing request ID |
 | `cancelRequest` | "Request Id cannot be null" | Missing request ID |
-| `createRequest` | "getAccount() is null" | Missing accountId or requester |
+| `createRequest` | "getAccount() is null" | Server NPE bug |
 
-### Category: Resource (6)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
+### Resource (6)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
 | `resourceAs400Create` | 500 HTML | Missing required fields |
-| `resourceCiscoCreate` | "name cannot be null" | Missing name |
-| `resourceOracleCreate` | "name cannot be null" | Missing name |
+| `resourceCiscoCreate` | "String.toLowerCase() NPE" | Missing name |
+| `resourceOracleCreate` | "String.toLowerCase() NPE" | Missing name |
 | `resourceSQLCreate` | 500 HTML | Missing required fields |
-| `resourceUnixCreate` | "name cannot be null" | Missing name |
-| `resourceWindowsCreate` | "name cannot be null" | Missing name |
+| `resourceUnixCreate` | "String.toLowerCase() NPE" | Missing name |
+| `resourceWindowsCreate` | "String.toLowerCase() NPE" | Missing name |
 
-### Category: User (8)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
+### User (8)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
 | `userCreate` | 500 HTML | Missing required fields |
 | `userDelete` | 500 HTML | Needs valid user ID |
-| `userGetByUsername` | 500 HTML | Endpoint implementation issue |
-| `userUpdate` | "User is not exist" | User ID not found |
-| `userUpdateQr` | 500 HTML | 2FA related, needs valid user |
+| `userGetByUsername` | 500 HTML | Endpoint bug |
+| `userGetLastLogin` | 500 HTML | Endpoint bug |
+| `userUpdate` | 500 HTML | Needs valid user ID |
+| `userUpdateQr` | 500 HTML | Needs valid user ID |
 | `userCommonCreate` | 500 HTML | Missing required fields |
 | `userCommonUpdate` | 500 HTML | Needs valid user ID |
-| `userGroupCreate` | 500 HTML | Missing required fields |
-| `userGroupDelete` | 500 HTML | Needs valid group ID |
-| `userGroupUpdate` | 500 HTML | Needs valid group ID |
-| `userUserGroupAdd` | 500 HTML | Missing userId or userGroupId |
-| `userUserGroupRemove` | 500 HTML | Missing userId or userGroupId |
 
-### Category: Other (5)
-| Endpoint | Error | Likely Cause |
-|----------|-------|--------------|
-| `custodianPasswordGet` | 500 HTML | User not found or N/A |
+### User Group (4)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
+| `userGroupDelete` | "user group id does not exists" | Needs valid group ID |
+| `userGroupUpdate` | 500 HTML | Needs valid group ID |
+| `userUserGroupAdd` | 500 HTML | Missing fields |
+| `userUserGroupRemove` | 500 HTML | Missing fields |
+
+### Other (5)
+| Endpoint | Error | Cause |
+|----------|-------|-------|
+| `custodianPasswordGet` | 500 HTML | Endpoint bug |
 | `passwordPolicyCreate` | 500 HTML | Missing required fields |
-| `scheduleProfileCreate` | "name cannot be null" | Missing name |
+| `scheduleProfileCreate` | "For input string: daily" | Wrong param type |
 | `sshKeyPolicyCreate` | 500 HTML | Missing required fields |
 | `workflowProfileCreate` | 500 HTML | Missing required fields |
 
@@ -135,20 +139,21 @@
 
 1. **alarmGet, nodeGet, serviceStatusGet** - Return 404 (REST module not deployed on server)
 
-2. **500 HTML errors** - Server returns generic HTML error page when Hibernate validation fails or required fields are missing
+2. **500 HTML errors** - Server returns generic HTML when Hibernate validation fails
 
-3. **connectionPasswordGet** - Always returns "connection not exist" because the API user lacks permission to retrieve passwords for connections
+3. **"String.toLowerCase() NPE"** - Resource endpoints expect `resource_type` field but it's being called with `name=null`
 
-4. **createRequest** - Server-side bug: `getAccount()` NPE even with valid `accountId` - the endpoint expects account NAME not ID
+4. **connectionPasswordGet** - Always "connection not exist" - API user lacks password retrieval permission
 
-5. **Most create/update endpoints** - Require specific field combinations that aren't documented in the API spec
+5. **createRequest** - Server-side bug: `getAccount()` NPE - needs ACCOUNT NAME not ID
+
+6. **userGetByUsername, userGetLastLogin, custodianPasswordGet** - 500 HTML - endpoint implementation issue
 
 ---
 
-## Test Data in DB
-
-- **Users:** mgadmin (id=1), user, testuser
-- **Resources:** test-unix-server, test-win-server, test-db-server, test-app-server, oracle19c-lab, unix-test
-- **Accounts:** system, test, test-admin, test-user, win-admin, db-admin, app-admin
-- **Connections:** test-ssh-connection (deleted during tests)
-- **User Groups:** test-group
+## Test Data IDs Used
+- **Connection ID:** 9f870988-5290-11f1-9b86-005056afa2d7 (test-ssh-conn)
+- **User ID:** af48a024-528a-11f1-9b86-005056afa2d7 (testuser)
+- **Account ID:** 8b906fda-528e-11f1-9b86-005056afa2d7 (app-admin)
+- **User Group ID:** 00e94110-6f3c-4a7e-afaf-c95c54cf26c3 (test-group)
+- **Resource Name:** test-unix-server
