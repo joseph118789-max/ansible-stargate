@@ -255,7 +255,7 @@ def run_module():
     stop = module.params['stop']
     restart = module.params['restart']
 
-    base_endpoint = "/api/services"
+    base_endpoint = "/adama/rest/serviceStatusGet"
 
     try:
         if module.check_mode:

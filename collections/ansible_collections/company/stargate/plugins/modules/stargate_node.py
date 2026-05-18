@@ -227,7 +227,7 @@ def run_module():
     timeout = module.params['timeout']
     discover = module.params['discover']
 
-    base_endpoint = "/api/nodes"
+    base_endpoint = "/adama/rest/nodeGet"
 
     try:
         if module.check_mode:

@@ -8,9 +8,10 @@
     validate_certs: "{{ stargate_validate_certs }}"
     use_ssl: "{{ stargate_use_ssl }}"
     timeout: "{{ stargate_timeout }}"
-    endpoint: "/api/alarms"
-    params:
-      status: active
+    endpoint: "/adama/rest/alarmGet"
+    data:
+      start: 0
+      length: 100
   register: current_alarms
 
 - name: Fetch current node status
@@ -20,7 +21,10 @@
     validate_certs: "{{ stargate_validate_certs }}"
     use_ssl: "{{ stargate_use_ssl }}"
     timeout: "{{ stargate_timeout }}"
-    endpoint: "/api/nodes"
+    endpoint: "/adama/rest/nodeGet"
+    data:
+      start: 0
+      length: 100
   register: current_nodes
 
 - name: Fetch current service status
@@ -30,7 +34,8 @@
     validate_certs: "{{ stargate_validate_certs }}"
     use_ssl: "{{ stargate_use_ssl }}"
     timeout: "{{ stargate_timeout }}"
-    endpoint: "/api/services"
+    endpoint: "/adama/rest/serviceStatusGet"
+    data: {}
   register: current_services
 
 - name: Count critical alarms

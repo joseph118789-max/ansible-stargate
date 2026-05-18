@@ -243,7 +243,7 @@ def run_module():
     acknowledge_all = module.params['acknowledge_all']
     clear_all = module.params['clear_all']
 
-    base_endpoint = "/api/alarms"
+    base_endpoint = "/adama/rest/alarmGet"
 
     try:
         if module.check_mode:

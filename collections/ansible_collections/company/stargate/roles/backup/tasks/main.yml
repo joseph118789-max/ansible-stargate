@@ -8,7 +8,7 @@
     validate_certs: "{{ stargate_validate_certs }}"
     use_ssl: "{{ stargate_use_ssl }}"
     timeout: "{{ stargate_timeout }}"
-    endpoint: "/api/config"
+    endpoint: "/adama/rest/configGet"
   register: config_result
   when: backup_include_config | bool
 
@@ -19,10 +19,12 @@
     validate_certs: "{{ stargate_validate_certs }}"
     use_ssl: "{{ stargate_use_ssl }}"
     timeout: "{{ stargate_timeout }}"
-    endpoint: "/api/alarms"
-    params:
+    endpoint: "/adama/rest/alarmGet"
+    data:
+      start: 0
+      length: 100
       status: active
-      include_history: "{{ backup_include_history | string }}"
+      include_history: "{{ backup_include_history }}"
   register: alarms_backup
   when: backup_include_alarms | bool
 
@@ -33,7 +35,10 @@
     validate_certs: "{{ stargate_validate_certs }}"
     use_ssl: "{{ stargate_use_ssl }}"
     timeout: "{{ stargate_timeout }}"
-    endpoint: "/api/nodes"
+    endpoint: "/adama/rest/nodeGet"
+    data:
+      start: 0
+      length: 100
   register: nodes_backup
   when: backup_include_nodes | bool
 
@@ -44,7 +49,8 @@
     validate_certs: "{{ stargate_validate_certs }}"
     use_ssl: "{{ stargate_use_ssl }}"
     timeout: "{{ stargate_timeout }}"
-    endpoint: "/api/services"
+    endpoint: "/adama/rest/serviceStatusGet"
+    data: {}
   register: services_backup
   when: backup_include_services | bool
 
