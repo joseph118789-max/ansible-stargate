@@ -14,20 +14,21 @@ author:
 version_added: "1.0.0"
 short_description: Authenticate with Stargate REST API
 description:
-  - Authenticates with Stargate/MasterSAM REST API and returns a session token.
-  - Supports username/password authentication with token storage for reuse.
+  - Authenticates with Stargate/MasterSAM REST API using username:token Bearer auth.
+  - The token is the API Secret from the MasterSAM API User configuration.
+  - Auth format: base64(username:token) sent as Authorization: Bearer <b64>
 notes:
-  - Use M(stargate_logout) to properly terminate the session when done.
+  - Token is used directly as the API secret from Stargate API User configuration.
+  - No separate login endpoint - authentication is done per-request with Bearer token.
 requirements:
   - python >= 3.8
-  - requests
 extends_documentation_fragment:
   - company.stargate.stargate
 options:
   state:
     description:
-      - C(present) will authenticate and return token.
-      - C(absent) will logout the session.
+      - C(present) returns the token in expected format.
+      - C(absent) is a no-op for logout (Stargate uses stateless auth).
     type: str
     choices: [present, absent]
     default: present
@@ -44,58 +45,50 @@ options:
 '''
 
 EXAMPLES = r'''
-# Login and store token for subsequent tasks
+# Login with API user and secret
 - name: Login to Stargate
   company.stargate.stargate_login:
-    server: "https://pms.tony.lab.ctc-g.com.my:9443"
-    username: "admin"
-    password: "password"
+    server: "https://10.201.208.160:8443"
+    username: "ansible"
+    password: "d147ef1f-896d-487c-833e-28154903afc5"
   register: login_result
 
-- name: Print token
-  ansible.builtin.debug:
-    msg: "Token is {{ login_result.token }}"
-
-# Logout at end of play
-- name: Logout from Stargate
-  company.stargate.stargate_logout:
-    server: "https://pms.tony.lab.ctc-g.com.my:9443"
+# Use token in subsequent calls
+- name: Get users
+  company.stargate.stargate_get:
+    server: "https://10.201.208.160:8443"
     token: "{{ login_result.token }}"
+    endpoint: "/userGet"
+    data:
+      start: 0
+      length: 5
 '''
 
 RETURN = r'''
 token:
-  description: The session token returned by Stargate.
+  description: The raw API token (username:token format, base64 encoded by stargate_utils).
   type: str
   returned: on successful login
-expires:
-  description: Token expiration time if available.
+username:
+  description: The username used for authentication.
   type: str
-  returned: when available
+  returned: on successful login
 '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.text.converters import to_native
 
-try:
-    from ..module_utils.stargate_utils import stargate_login as api_login
-    from ..module_utils.stargate_utils import stargate_logout as api_logout
-except ImportError:
-    from ansible_collections.company.stargate.plugins.module_utils.stargate_utils import stargate_login as api_login
-    from ansible_collections.company.stargate.plugins.module_utils.stargate_utils import stargate_logout as api_logout
-
 
 def run_module():
     module_args = dict(
         server=dict(type='str', required=True, aliases=['url']),
-        username=dict(type='str', required=False),
-        password=dict(type='str', required=False, no_log=True),
+        username=dict(type='str', required=True),
+        password=dict(type='str', required=True, no_log=True),
         token=dict(type='str', required=False, no_log=True),
         state=dict(type='str', default='present', choices=['present', 'absent']),
-        validate_certs=dict(type='bool', default=True),
+        validate_certs=dict(type='bool', default=False),
         use_ssl=dict(type='bool', default=True),
         timeout=dict(type='int', default=30),
-        api_version=dict(type='str', default='11.7.0'),
         persist_token=dict(type='bool', default=True),
         token_name=dict(type='str', default='stargate_token'),
     )
@@ -111,56 +104,30 @@ def run_module():
     result = {
         'changed': False,
         'token': None,
+        'username': None,
     }
 
     if module.check_mode:
         module.exit_json(**result)
 
-    server = module.params['server']
-    state = module.params['state']
-    username = module.params.get('username')
-    password = module.params.get('password')
-    token = module.params.get('token')
+    username = module.params['username']
+    password = module.params['password']  # This is the API token/secret
     persist_token = module.params['persist_token']
     token_name = module.params['token_name']
-    timeout = module.params['timeout']
-    validate_certs = module.params['validate_certs']
 
-    try:
-        if state == 'present':
-            # If no token provided, perform login
-            if not token and username and password:
-                module.debug("Authenticating with username/password")
-                token = api_login(
-                    module,
-                    server,
-                    username,
-                    password,
-                    validate_certs=validate_certs,
-                    timeout=timeout
-                )
-                result['changed'] = True
+    # Stargate uses username:token as the auth credential
+    # The raw token format is "username:token" - stargate_utils handles base64 encoding
+    raw_token = "{}:{}".format(username, password)
+    
+    result['token'] = raw_token
+    result['username'] = username
+    result[token_name] = raw_token
 
-            result['token'] = token
-            result[token_name] = token
+    # Store in ansible_facts for reuse
+    module.params['ansible_facts'] = {token_name: raw_token}
 
-            # Store in ansible_facts for reuse
-            module.params['ansible_facts'] = {token_name: token}
-
-            result['msg'] = 'Successfully authenticated with Stargate'
-            module.exit_json(**result)
-
-        elif state == 'absent':
-            if not token:
-                module.fail_json(msg="token is required for logout")
-
-            api_logout(module, server, token, validate_certs=validate_certs, timeout=timeout)
-            result['changed'] = True
-            result['msg'] = 'Successfully logged out from Stargate'
-            module.exit_json(**result)
-
-    except Exception as e:
-        module.fail_json(msg="Login/logout failed: {}".format(to_native(e)))
+    result['msg'] = 'Token prepared for Stargate API (auth handled per-request)'
+    module.exit_json(**result)
 
 
 def main():

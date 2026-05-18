@@ -14,10 +14,11 @@ author:
 version_added: "1.0.0"
 short_description: Generic GET requests to Stargate REST API
 description:
-  - Makes GET requests to Stargate REST API endpoints.
+  - Makes POST requests to Stargate REST API endpoints (Stargate uses POST for all operations).
   - Supports check_mode, idempotency, and response parsing.
 notes:
-  - Use this module for read-only operations against any API endpoint.
+  - Stargate REST API uses POST for all endpoints at /adama/rest/{endpoint}
+  - Data is passed as JSON body, not query parameters.
 requirements:
   - python >= 3.8
 extends_documentation_fragment:
@@ -25,46 +26,43 @@ extends_documentation_fragment:
 options:
   endpoint:
     description:
-      - API endpoint path to query.
-      - Should start with /api/ or /.
+      - API endpoint name (e.g., /userGet, /connectionGet).
+      - Will be prefixed with /adama/rest/
     type: str
     required: true
-  params:
+  data:
     description:
-      - Query parameters to append to the URL.
+      - JSON body data to send with the request.
     type: dict
     required: false
-  return_raw:
+  return_content:
     description:
-      - Return raw response without JSON parsing.
-    type: bool
-    default: false
+      - Key in response to extract (e.g., 'user', 'connection', 'alarm').
+    type: str
+    required: false
 '''
 
 EXAMPLES = r'''
-# Get all alarms
-- name: Fetch all alarms
+# Get all users
+- name: Fetch users
   company.stargate.stargate_get:
-    server: "https://pms.example.com:9443"
-    token: "{{ stargate_token }}"
-    endpoint: "/api/alarms"
+    server: "https://10.201.208.160:8443"
+    token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    endpoint: "/userGet"
+    data:
+      start: 0
+      length: 5
+  register: result
 
-# Get specific alarm by ID
-- name: Fetch alarm details
+# Get connections
+- name: Fetch connections
   company.stargate.stargate_get:
-    server: "https://pms.example.com:9443"
-    token: "{{ stargate_token }}"
-    endpoint: "/api/alarms/123"
-
-# Get nodes with filters
-- name: Get active nodes
-  company.stargate.stargate_get:
-    server: "https://pms.example.com:9443"
-    token: "{{ stargate_token }}"
-    endpoint: "/api/nodes"
-    params:
-      status: active
-      site: site1
+    server: "https://10.201.208.160:8443"
+    token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    endpoint: "/connectionGet"
+    data:
+      start: 0
+      length: 10
 '''
 
 RETURN = r'''
@@ -91,13 +89,11 @@ def run_module():
     module_args = dict(
         server=dict(type='str', required=True, aliases=['url']),
         token=dict(type='str', required=True, no_log=True),
-        validate_certs=dict(type='bool', default=True),
+        validate_certs=dict(type='bool', default=False),
         use_ssl=dict(type='bool', default=True),
         timeout=dict(type='int', default=30),
-        api_version=dict(type='str', default='11.7.0'),
         endpoint=dict(type='str', required=True),
-        params=dict(type='dict', required=False, default=None),
-        return_raw=dict(type='bool', default=False),
+        data=dict(type='dict', required=False, default=None),
     )
 
     module = AnsibleModule(
@@ -114,42 +110,34 @@ def run_module():
     server = module.params['server']
     token = module.params['token']
     endpoint = module.params['endpoint']
-    params = module.params['params']
-    return_raw = module.params['return_raw']
+    data = module.params['data']
     timeout = module.params['timeout']
-    validate_certs = module.params['validate_certs']
-    use_ssl = module.params['use_ssl']
-    api_version = module.params['api_version']
 
     try:
         if module.check_mode:
-            result['msg'] = 'Check mode: would perform GET to {}'.format(endpoint)
+            result['msg'] = 'Check mode: would perform POST to /adama/rest{}'.format(endpoint)
             module.exit_json(**result)
 
-        # Build endpoint with query params if provided
-        if params:
-            param_str = '&'.join(['{}={}'.format(k, v) for k, v in params.items()])
-            endpoint = '{}?{}'.format(endpoint, param_str) if '?' not in endpoint else '{}&{}'.format(endpoint, param_str)
+        # Stargate expects /adama/rest/{endpoint}
+        if not endpoint.startswith('/'):
+            endpoint = '/' + endpoint
+        api_endpoint = '/adama/rest{}'.format(endpoint)
 
         response, status_code = stargate_api_wrapper(
             module,
-            'GET',
-            endpoint,
-            headers={"Authorization": "Bearer {}".format(token)},
+            'POST',
+            api_endpoint,
+            data=data,
             timeout=timeout
         )
 
-        if return_raw:
-            result['data'] = response
-        else:
-            result['data'] = response
-
+        result['data'] = response
         result['status_code'] = status_code
-        result['msg'] = 'Successfully retrieved data from {}'.format(endpoint)
+        result['msg'] = 'Successfully retrieved data from {}'.format(api_endpoint)
         module.exit_json(**result)
 
     except Exception as e:
-        module.fail_json(msg="GET request failed: {}".format(to_native(e)))
+        module.fail_json(msg="POST request failed: {}".format(to_native(e)))
 
 
 def main():
