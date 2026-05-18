@@ -1,0 +1,34 @@
+#!/usr/bin/env ansible-playbook
+# Tests for nodes role
+# Run: ansible-playbook -i localhost, tests/roles/test_nodes.yml
+
+- name: Test Stargate Nodes Role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    stg_server: "https://10.201.208.160:8443"
+    stg_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stg_validate_certs: false
+    stg_use_ssl: true
+    stg_timeout: 30
+
+  tasks:
+    - name: List all nodes
+      ansible.builtin.include_role:
+        name: company.stargate.nodes
+      vars:
+        stargate_server: "{{ stg_server }}"
+        stargate_token: "{{ stg_token }}"
+        stargate_validate_certs: "{{ stg_validate_certs }}"
+        stargate_use_ssl: "{{ stg_use_ssl }}"
+        stargate_timeout: "{{ stg_timeout }}"
+        node_operation: list
+
+    - name: Verify nodes fact was set
+      ansible.builtin.assert:
+        that:
+          - nodes is defined
+
+    - name: Display node count
+      ansible.builtin.debug:
+        msg: "✅ Nodes fact set, count: {{ nodes | length if nodes is iterable else 'N/A' }}"

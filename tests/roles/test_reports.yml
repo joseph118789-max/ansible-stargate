@@ -1,0 +1,39 @@
+#!/usr/bin/env ansible-playbook
+# Tests for reports role
+# Run: ansible-playbook -i localhost, tests/roles/test_reports.yml
+
+- name: Test Stargate Reports Role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    stg_server: "https://10.201.208.160:8443"
+    stg_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stg_validate_certs: false
+    stg_use_ssl: true
+    stg_timeout: 30
+
+  tasks:
+    - name: Run reports role
+      ansible.builtin.include_role:
+        name: company.stargate.reports
+      vars:
+        stargate_server: "{{ stg_server }}"
+        stargate_token: "{{ stg_token }}"
+        stargate_validate_certs: "{{ stg_validate_certs }}"
+        stargate_use_ssl: "{{ stg_use_ssl }}"
+        stargate_timeout: "{{ stg_timeout }}"
+        report_type: full
+        report_dest_path: "/tmp"
+        report_file_mode: "0644"
+        report_save: true
+        report_include_raw: false
+
+    - name: Verify report was generated
+      ansible.builtin.assert:
+        that:
+          - stargate_report is defined
+          - stargate_report.generated_at is defined
+
+    - name: Display report info
+      ansible.builtin.debug:
+        msg: "✅ Report generated successfully"

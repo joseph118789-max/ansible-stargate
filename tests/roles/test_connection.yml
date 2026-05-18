@@ -1,0 +1,58 @@
+#!/usr/bin/env ansible-playbook
+# Tests for connection role
+# Run: ansible-playbook -i localhost, tests/roles/test_connection.yml
+
+- name: Test Stargate Connection Role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    stg_server: "https://10.201.208.160:8443"
+    stg_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stg_validate_certs: false
+    stg_use_ssl: true
+    stg_timeout: 30
+
+  tasks:
+    - name: Get connections (list operation)
+      ansible.builtin.include_role:
+        name: company.stargate.connection
+      vars:
+        stargate_server: "{{ stg_server }}"
+        stargate_token: "{{ stg_token }}"
+        stargate_validate_certs: "{{ stg_validate_certs }}"
+        stargate_use_ssl: "{{ stg_use_ssl }}"
+        stargate_timeout: "{{ stg_timeout }}"
+        connection_operation: get
+        connection_start: 0
+        connection_length: 10
+
+    - name: Verify connections were returned
+      ansible.builtin.assert:
+        that:
+          - connection_get_result.connection is defined
+          - connection_get_result.connection is iterable
+
+    - name: Display connection count
+      ansible.builtin.debug:
+        msg: "✅ Found {{ connection_get_result.connection | length }} connections"
+
+    - name: Get connection count
+      ansible.builtin.include_role:
+        name: company.stargate.connection
+      vars:
+        stargate_server: "{{ stg_server }}"
+        stargate_token: "{{ stg_token }}"
+        stargate_validate_certs: "{{ stg_validate_certs }}"
+        stargate_use_ssl: "{{ stg_use_ssl }}"
+        stargate_timeout: "{{ stg_timeout }}"
+        connection_operation: count
+
+    - name: Verify count was returned
+      ansible.builtin.assert:
+        that:
+          - connection_count_result.message is defined
+          - connection_count_result.message | int >= 0
+
+    - name: Display count result
+      ansible.builtin.debug:
+        msg: "✅ Connection count: {{ connection_count_result.message }}"

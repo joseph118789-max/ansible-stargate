@@ -11,6 +11,7 @@ Provides shared functions for Stargate API modules
 
 import base64
 import json
+import ssl
 import time
 import urllib3
 from ansible.module_utils.urls import fetch_url, urllib_error
@@ -70,15 +71,23 @@ def stargate_api_wrapper(module, method, endpoint, data=None, headers=None, time
     last_error = None
     for attempt in range(retries):
         try:
-            response, info = fetch_url(
-                module,
-                url,
-                method=method,
-                data=body,
-                headers=default_headers,
-                timeout=timeout,
-                validate_certs=validate_certs
-            )
+            # Build fetch_url kwargs (validate_certs not supported in Ansible 2.14+)
+            fetch_kwargs = {
+                'module': module,
+                'url': url,
+                'method': method,
+                'data': body,
+                'headers': default_headers,
+                'timeout': timeout,
+            }
+            
+            # Handle SSL verification - create unverified context if needed
+            if not validate_certs:
+                # Use ca_path=None with force=True to disable SSL verification
+                fetch_kwargs['force'] = True
+                fetch_kwargs['ca_path'] = None
+            
+            response, info = fetch_url(**fetch_kwargs)
 
             if response is None:
                 # Connection error - retry

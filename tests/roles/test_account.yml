@@ -1,0 +1,37 @@
+#!/usr/bin/env ansible-playbook
+# Tests for account role
+# Run: ansible-playbook -i localhost, tests/roles/test_account.yml
+
+- name: Test Stargate Account Role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    stg_server: "https://10.201.208.160:8443"
+    stg_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stg_validate_certs: false
+    stg_use_ssl: true
+    stg_timeout: 30
+
+  tasks:
+    - name: Get accounts (list operation)
+      ansible.builtin.include_role:
+        name: company.stargate.account
+      vars:
+        stargate_server: "{{ stg_server }}"
+        stargate_token: "{{ stg_token }}"
+        stargate_validate_certs: "{{ stg_validate_certs }}"
+        stargate_use_ssl: "{{ stg_use_ssl }}"
+        stargate_timeout: "{{ stg_timeout }}"
+        account_operation: get
+        account_start: 0
+        account_length: 10
+
+    - name: Verify accounts were returned
+      ansible.builtin.assert:
+        that:
+          - account_get_result.account is defined
+          - account_get_result.account is iterable
+
+    - name: Display account count
+      ansible.builtin.debug:
+        msg: "✅ Found {{ account_get_result.account | length }} accounts"

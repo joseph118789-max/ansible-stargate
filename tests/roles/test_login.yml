@@ -1,0 +1,38 @@
+#!/usr/bin/env ansible-playbook
+# Tests for login role
+# Run: ansible-playbook -i localhost, tests/roles/test_login.yml
+
+- name: Test Stargate Login Role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    # Direct values to avoid variable precedence issues
+    stg_server: "https://10.201.208.160:8443"
+    stg_username: "ansible"
+    stg_password: "d147ef1f-896d-487c-833e-28154903afc5"
+    stg_validate_certs: false
+    stg_use_ssl: true
+    stg_timeout: 30
+
+  tasks:
+    - name: Include login role with required variables
+      ansible.builtin.include_role:
+        name: company.stargate.login
+      vars:
+        stargate_server: "{{ stg_server }}"
+        stargate_username: "{{ stg_username }}"
+        stargate_password: "{{ stg_password }}"
+        stargate_validate_certs: "{{ stg_validate_certs }}"
+        stargate_use_ssl: "{{ stg_use_ssl }}"
+        stargate_timeout: "{{ stg_timeout }}"
+
+    - name: Verify token was set
+      ansible.builtin.assert:
+        that:
+          - stargate_token is defined
+          - stargate_token | length > 0
+          - stargate_logged_in | bool
+
+    - name: Display login result
+      ansible.builtin.debug:
+        msg: "✅ Login role test passed. Token set successfully."

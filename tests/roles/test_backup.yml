@@ -1,0 +1,46 @@
+#!/usr/bin/env ansible-playbook
+# Tests for backup role
+# Run: ansible-playbook -i localhost, tests/roles/test_backup.yml
+
+- name: Test Stargate Backup Role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    stg_server: "https://10.201.208.160:8443"
+    stg_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stg_validate_certs: false
+    stg_use_ssl: true
+    stg_timeout: 30
+    stg_version: "11.7.0"
+    bk_dest_path: "/tmp"
+    bk_file_mode: "0644"
+
+  tasks:
+    - name: Run backup role
+      ansible.builtin.include_role:
+        name: company.stargate.backup
+      vars:
+        stargate_server: "{{ stg_server }}"
+        stargate_token: "{{ stg_token }}"
+        stargate_validate_certs: "{{ stg_validate_certs }}"
+        stargate_use_ssl: "{{ stg_use_ssl }}"
+        stargate_timeout: "{{ stg_timeout }}"
+        stargate_version: "{{ stg_version }}"
+        backup_dest_path: "{{ bk_dest_path }}"
+        backup_file_mode: "{{ bk_file_mode }}"
+        backup_include_config: true
+        backup_include_nodes: true
+        backup_include_services: true
+        backup_include_alarms: true
+        backup_save_local: true
+        backup_trigger_api: false
+
+    - name: Verify backup was created
+      ansible.builtin.assert:
+        that:
+          - backup_timestamp is defined
+          - backup_path is defined
+
+    - name: Display backup path
+      ansible.builtin.debug:
+        msg: "✅ Backup created at {{ backup_path }}"
