@@ -1,212 +1,66 @@
 # Stargate REST API v11.7.0 - Endpoint Mapping
 
-## API Base URL
+**Server:** https://10.201.208.160:8443
+**Base Path:** /adama/rest/{endpoint}
+**Auth:** base64(username:token) as Bearer token
+
+## Verified Working Endpoints
+
+| Endpoint | Method | Description | Status |
+|----------|--------|-------------|--------|
+| `userGet` | POST | Get users | ✅ Working |
+| `userCount` | POST | Count users | ✅ Working |
+| `connectionGet` | POST | Get connections | ✅ Working |
+| `connectionCount` | POST | Count connections | ✅ Working |
+| `connectionCreate` | POST | Create connection | ✅ Working |
+| `connectionDelete` | POST | Delete connection | ✅ Working |
+| `accountPasswordGet` | POST | Get account password | ✅ Working |
+| `accountPasswordPlainCreate` | POST | Create plain password | ✅ Working |
+| `accountInsecurePasswordGet` | POST | Get insecure password | ✅ Working |
+| `accountCommonGet` | POST | Get account common data | ✅ Working |
+| `accountCreate` | POST | Create account | ✅ Working |
+| `resourceOracleCreate` | POST | Create Oracle resource | ✅ Working |
+| `resourceUnixCreate` | POST | Create Unix resource | ✅ Working |
+| `resourceWindowsCreate` | POST | Create Windows resource | ✅ Working |
+
+## Request/Response Format
+
+All endpoints use POST with JSON body:
+```json
+{
+  "start": "0",
+  "length": "10"
+}
 ```
-https://{server}:{port}/adama/rest/{endpoint}
+
+Response format:
+```json
+{
+  "<resource>": [...],
+  "errorMsg": null
+}
 ```
 
 ## Authentication
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| Auth via MasterSAM UI | Browser-based | Session cookie + JWT token |
 
-## Endpoint Categories
+```python
+import base64
 
-### Account (10 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `accountCommonGet` | GET | Retrieve accounts common data |
-| `accountCreate` | POST | Create account |
-| `accountDelete` | DELETE | Delete account |
-| `accountGetByName` | GET | Get account by name |
-| `accountInsecurePasswordGet` | GET | Retrieve account key |
-| `accountKeyCreate` | POST | Create SSH Key for account |
-| `accountKeyGet` | GET | Retrieve account SSH Key |
-| `accountPasswordGet` | GET | Retrieve account password |
-| `accountPasswordPlainCreate` | POST | Create password for account |
-| `accountUpdate` | PUT | Update account |
+# Format: username:api_token
+token = "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+auth_b64 = base64.b64encode(token.encode()).decode()
 
-### Account Setting Profile (3 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `accountSettingProfileCreate` | POST | Create setting profile |
-| `accountSettingProfileDelete` | DELETE | Delete setting profile |
-| `accountSettingProfileUpdate` | PUT | Update setting profile |
-
-### Account Workflow Profile (4 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `accountWorkflowProfileCreate` | POST | Create workflow profile |
-| `accountWorkflowProfileDelete` | DELETE | Delete workflow profile |
-| `accountWorkflowProfileGet` | GET | Retrieve workflow profile |
-| `accountWorkflowProfileUpdate` | PUT | Update workflow profile |
-
-### Approved Connection (4 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `approvedConnectionCount` | GET | Count approved connections |
-| `approvedConnectionCreate` | POST | Create approved connection |
-| `approvedConnectionDelete` | DELETE | Delete approved connection |
-| `approvedConnectionGet` | GET | Retrieve approved connection |
-
-### Connection (10 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `connectionCount` | GET | Count connections |
-| `connectionCreate` | POST | Create connection |
-| `connectionDelete` | DELETE | Delete connection |
-| `connectionDeleteAll` | DELETE | Delete all connections |
-| `connectionExport` | POST | Export connections |
-| `connectionGet` | GET | Retrieve connections |
-| `connectionMonitoringCount` | GET | Count monitoring connections |
-| `connectionPasswordGet` | GET | Retrieve connection password |
-| `connectionPasswordReset` | POST | Reset connection password |
-
-### Connection Authorization (7 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `connectionAuthorizationConnectionGroupAdd` | POST | Add connection group |
-| `connectionAuthorizationCreate` | POST | Create connection authorization |
-| `connectionAuthorizationDelete` | DELETE | Delete connection authorization |
-| `connectionAuthorizationGet` | GET | Retrieve connection authorization |
-| `connectionAuthorizationRemoveConnectionGroups` | POST | Remove connection groups |
-| `connectionAuthorizationRemoveUserGroups` | POST | Remove user groups |
-| `connectionAuthorizationUserGroupAdd` | POST | Add user group |
-
-### Connection Group (4 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `connectionGroupCreate` | POST | Create connection group |
-| `connectionGroupDelete` | DELETE | Delete connection group |
-| `connectionGroupGet` | GET | Retrieve connection groups |
-| `connectionGroupUpdate` | PUT | Update connection group |
-
-### Request Workflow (4 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `accountRequestApproveEmail` | POST | Send approval email |
-| `approveRequest` | POST | Approve request |
-| `cancelRequest` | POST | Cancel request |
-| `createRequest` | POST | Create request |
-
-### Resources (6 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `resourceAs400Create` | POST | Create AS/400 resource |
-| `resourceCiscoCreate` | POST | Create Cisco resource |
-| `resourceOracleCreate` | POST | Create Oracle resource |
-| `resourceSqlCreate` | POST | Create SQL resource |
-| `resourceUnixCreate` | POST | Create Unix resource |
-| `resourceWindowsCreate` | POST | Create Windows resource |
-
-### User (9 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `userCount` | GET | Count users |
-| `userCreate` | POST | Create user |
-| `userDelete` | DELETE | Delete user |
-| `userGet` | GET | Return all users |
-| `userGetByUsername` | GET | Get user by username |
-| `userGetLastLogin` | GET | Get user's last login |
-| `userMonitoringCount` | GET | Count monitoring users |
-| `userUpdate` | PUT | Update user |
-| `userUpdateQr` | PUT | Update user QR code |
-
-### User Common (3 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `userCommonCreate` | POST | Create user with common details |
-| `userCommonGet` | GET | Return users with common info |
-| `userCommonUpdate` | PUT | Update user's common details |
-
-### User Group (7 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `userGroupCreate` | POST | Create user group |
-| `userGroupDelete` | DELETE | Delete user group |
-| `userGroupGet` | GET | Return user groups |
-| `userGroupUpdate` | PUT | Update user group |
-| `userUserGroupAdd` | POST | Add user to group |
-| `userUserGroupGet` | GET | Return users and groups |
-| `userUserGroupRemove` | POST | Remove user from group |
-
-### Ungrouped (5 endpoints)
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `custodianPasswordGet` | GET | Retrieve custodian password |
-| `passwordPolicyCreate` | POST | Create password policy |
-| `scheduleProfileCreate` | POST | Create schedule profile |
-| `sshKeyPolicyCreate` | POST | Create SSH key policy |
-| `workflowProfileCreate` | POST | Create workflow profile |
-
-## Common Request/Response Patterns
-
-### Pagination (accountCommonGet, userGet, connectionGet)
-```json
-// Request
-{
-  "start": "integer",
-  "length": "integer"
-}
-
-// Response
-{
-  "account": [...],
-  "total": "integer"
+headers = {
+    "Authorization": f"Bearer {auth_b64}",
+    "Content-Type": "application/json"
 }
 ```
 
-### Account Object
-```json
-{
-  "id": "uuid",
-  "name": "string",
-  "resource": "string",
-  "description": "string",
-  "passwordPolicy": "string",
-  "sshKeyPolicy": "string",
-  "scheduleProfileVerify": "string",
-  "scheduleProfileReset": "string",
-  "scheduleProfileSshKeyReset": "string",
-  "accountWorkflowProfile": ["string"],
-  "disableManualPasswordResetPropagation": "boolean",
-  "disableWorkflowPasswordResetTrigger": "boolean",
-  "adminToResetPassword": "boolean",
-  "requestorToViewPassword": "boolean",
-  "enableEmailNotification": "string"
-}
-```
+## Example: Get Connections
 
-### User Object
-```json
-{
-  "id": "uuid",
-  "username": "string",
-  "email": "string",
-  "fullName": "string",
-  "isActive": "boolean",
-  "userGroups": ["string"],
-  "lastLogin": "datetime"
-}
+```bash
+curl -sk -X POST https://10.201.208.160:8443/adama/rest/connectionGet \
+  -H "Authorization: Bearer YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=" \
+  -H "Content-Type: application/json" \
+  -d '{"start":"0","length":"5"}'
 ```
-
-### Connection Object
-```json
-{
-  "id": "uuid",
-  "name": "string",
-  "account": "string",
-  "resource": "string",
-  "host": "string",
-  "port": "integer",
-  "protocol": "string",
-  "status": "string"
-}
-```
-
-## Notes
-- All endpoints use `/adama/rest/` prefix (NOT `/api/`)
-- Authentication: Browser-based MasterSAM UI session + JWT
-- API runs on port 8443 by default
-- All requests return JSON
-- Pagination uses `start` and `length` parameters
