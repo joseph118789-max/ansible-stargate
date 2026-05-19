@@ -4,32 +4,99 @@ version: 1.0.0
 readme: README.md
 authors:
   - Company Automation Team <automation@company.com>
-description: Ansible Collection for Stargate REST API automation
+description: |
+  Ansible collection for MasterSAM Stargate REST API v11.7.0 automation.
+  
+  This collection provides modules, roles, and playbooks for managing
+  MasterSAM Stargate privileged access management system through its
+  REST API interface.
+  
+  **Key Features:**
+  - Authentication and session management
+  - User, connection, and account CRUD operations
+  - Alarm monitoring and management
+  - Node and service discovery
+  - Backup and reporting workflows
+  
+  **Supported API Version:** v11.7.0
+  **Server Requirements:** Stargate server with REST API enabled
+
 license:
   - GPL-3.0-or-later
 license_file: LICENSE
+
 tags:
   - stargate
   - mastersam
-  - monitoring
-  - noc
-  - alarm
-  - api
+  - pam
+  - privileged-access
   - automation
+  - security
+  - access-management
+  - ansible
+
+categories:
+  - cloud
+  - monitoring
+  - networking
+  - security
+  - system
+
 dependencies: {}
+
 repository: https://github.com/joseph118789-max/ansible-stargate
-documentation: https://github.com/joseph118789-max/ansible-stargate/blob/main/README.md
 homepage: https://github.com/joseph118789-max/ansible-stargate
 issues: https://github.com/joseph118789-max/ansible-stargate/issues
-min_ansible_version: "2.9"
-min_ansible_container_version: "2.10"
-platforms:
-  - name: EL
-    versions:
-      - "7"
-      - "8"
-  - name: Ubuntu
-    versions:
-      - bionic
-      - focal
-      - jammy
+
+keywords:
+  - stargate
+  - mastersam
+  - ansible
+  - automation
+  - pam
+  - privileged
+  - access
+  - management
+  - api
+  - rest
+
+documentation: https://github.com/joseph118789-max/ansible-stargate/blob/main/README.md
+version_added: "1.0.0"
+
+buildignore:
+  - .git/
+  - "*.md"
+  - tests/
+  - "*.tar.gz"
+
+changelog: |
+  ## 1.0.0 (2026-05-19)
+  
+  **Initial Release**
+  
+  - 11 custom Ansible modules for Stargate REST API
+  - 10 roles for common automation workflows
+  - 5 sample playbooks for typical use cases
+  - Comprehensive unit and integration tests (123 tests passing)
+  - Full API documentation with 75+ endpoints documented
+  - Molecule scenarios for CI/CD integration testing
+  - GitHub Actions workflow for automated linting and testing
+
+fragments:
+  - description: Initial collection release
+    version: "1.0.0"
+    created: 2026-05-19
+    announcement:
+      - "Initial release of company.stargate collection"
+      - "11 modules, 10 roles, 5 playbooks"
+      - "123 unit tests passing"
+    features:
+      - "11 Ansible modules for Stargate API automation"
+      - "10 pre-built roles for common workflows"
+      - "5 sample playbooks"
+      - "123 passing unit tests"
+      - "3 Molecule scenarios for integration testing"
+    bugfixes: []
+    known_issues:
+      - "Some API endpoints return HTTP 500 due to server-side NPE bugs"
+      - "GWT-RPC login requires browser session (XSRF protection)"

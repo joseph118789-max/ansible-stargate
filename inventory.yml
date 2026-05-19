@@ -1,0 +1,61 @@
+# Sample Inventory for ansible-stargate collection
+# Save as inventory.yml and use with: ansible-playbook -i inventory.yml playbook.yml
+
+all:
+  vars:
+    # Stargate Server Configuration
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_validate_certs: false
+    stargate_timeout: 30
+    stargate_retries: 3
+    
+  children:
+    # Local execution group
+    localhost:
+      hosts:
+        localhost:
+          ansible_connection: local
+    
+    # Stargate server group (for running against remote targets)
+    stargate_servers:
+      hosts:
+        stargate-01:
+          ansible_host: 10.201.208.160
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+---
+# Alternative: Production inventory with multiple environments
+
+production:
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_validate_certs: false
+  children:
+    api_servers:
+      hosts:
+        stargate-prod:
+          ansible_host: 10.201.208.160
+          stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        stargate-dr:
+          ansible_host: 10.201.208.161
+          stargate_token: "ansible:backup-token-here"
+    monitoring_targets:
+      hosts:
+        monitor-01:
+          ansible_host: 192.168.1.100
+          monitor_interval: 60
+        monitor-02:
+          ansible_host: 192.168.1.101
+          monitor_interval: 120
+
+development:
+  vars:
+    stargate_server: "https://dev.stargate.local:8443"
+    stargate_validate_certs: false
+    stargate_token: "ansible:dev-token-here"
+  children:
+    dev_servers:
+      hosts:
+        dev-stargate:
+          ansible_host: 192.168.1.50

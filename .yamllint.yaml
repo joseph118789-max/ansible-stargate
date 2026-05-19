@@ -1,0 +1,57 @@
+---
+# Yamllint configuration for ansible-stargate collection
+
+# General rules
+rules:
+  # Line length (Ansible best practice)
+  line-length:
+    max: 120
+    level: warning
+  
+  # Indentation rules
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+  
+  # Trailing spaces
+  trailing-spaces: error
+  
+  # New lines
+  new-lines:
+    type: unix
+  
+  # Empty lines
+  empty-lines:
+    max: 1
+  
+  # Comments
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: warn
+  
+  # Key ordering
+  key-ordering: warn
+  
+  # Document start
+  document-start: disable
+  
+  # Document end
+  document-end: disable
+
+# File-specific rules
+extraneous-rules:
+  # Ignore certain paths
+  - path-patterns:
+      - .git/**
+      - .github/workflows/**
+      - tests/molecule/**
+      - "*.tar.gz"
+
+# Ignored paths
+ignore:
+  - .git
+  - .github
+  - venv
+  - __pycache__
+  - "*.pyc"
+  - .pytest_cache
