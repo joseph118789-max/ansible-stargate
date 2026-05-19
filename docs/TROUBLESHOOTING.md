@@ -13,8 +13,8 @@
    ```sql
    SELECT * FROM USER WHERE USERNAME = 'ansible';
    ```
-2. Check the token is correct (should be `f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c`)
-3. Ensure the token format is correct: `ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c`
+2. Check the token is correct (should be `YOUR_TOKEN`)
+3. Ensure the token format is correct: `ansible:YOUR_TOKEN`
 
 #### Error: "XSRF attack"
 
@@ -29,7 +29,7 @@
 **Solution:**
 ```bash
 # Correct token generation
-echo -n "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c" | base64
+echo -n "ansible:YOUR_TOKEN" | base64
 # Output: YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM=
 ```
 
@@ -42,7 +42,7 @@ echo -n "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c" | base64
 **Solution:**
 1. Check server is reachable:
    ```bash
-   curl -k -I https://10.201.208.160:8443/adama/
+   curl -k -I https://YOUR_SERVER_IP:8443/adama/
    ```
 2. Verify firewall rules
 3. Increase timeout in playbook:
@@ -158,8 +158,8 @@ data:
 # Required: server, token, endpoint
 - name: Get users
   company.stargate.stargate_get:
-    server: "https://10.201.208.160:8443"  # Required
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"  # Required
+    server: "https://YOUR_SERVER_IP:8443"  # Required
+    token: "ansible:YOUR_TOKEN"  # Required
     endpoint: "/userGet"  # Required
     data:  # Optional
       start: "0"
@@ -270,8 +270,8 @@ ansible-playbook playbooks/user-management.yml -vvv
   tasks:
     - name: Retrieve users
       company.stargate.stargate_get:
-        server: "https://10.201.208.160:8443"
-        token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        server: "https://YOUR_SERVER_IP:8443"
+        token: "ansible:YOUR_TOKEN"
         endpoint: "/userGet"
         data:
           start: "0"
@@ -287,10 +287,10 @@ ansible-playbook playbooks/user-management.yml -vvv
 
 ```bash
 # Check server is up
-curl -k -I https://10.201.208.160:8443/adama/
+curl -k -I https://YOUR_SERVER_IP:8443/adama/
 
 # Test API endpoint directly
-curl -k -X POST https://10.201.208.160:8443/adama/rest/userCount \
+curl -k -X POST https://YOUR_SERVER_IP:8443/adama/rest/userCount \
   -H "Authorization: Bearer YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM=" \
   -H "Content-Type: application/json" \
   -d '{}'

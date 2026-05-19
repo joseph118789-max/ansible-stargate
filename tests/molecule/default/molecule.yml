@@ -23,8 +23,8 @@ provisioner:
   inventory:
     group_vars:
       all:
-        stargate_server: "https://10.201.208.160:8443"
-        stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        stargate_server: "https://YOUR_SERVER_IP:8443"
+        stargate_token: "ansible:YOUR_TOKEN"
         validate_certs: false
     host_vars:
       localhost:

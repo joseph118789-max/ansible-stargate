@@ -4,12 +4,12 @@
 #
 # Usage:
 #   Export environment variables or use vault:
-#     export STARIMATE_SERVER="https://10.201.208.160:8443"
+#     export STARIMATE_SERVER="https://YOUR_SERVER_IP:8443"
 #     export STARIMATE_TOKEN="ansible:YOUR_API_TOKEN_HERE"
 #
 #   Or run with extra vars:
 #     ansible-playbook playbooks/user-management.yml \
-#       -e "stargate_server=https://10.201.208.160:8443" \
+#       -e "stargate_server=https://YOUR_SERVER_IP:8443" \
 #       -e "stargate_token=ansible:YOUR_TOKEN"
 #
 - name: Stargate User Management
@@ -17,7 +17,7 @@
   gather_facts: no
   vars:
     # Default values - override via environment or -e flag
-    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://10.201.208.160:8443', true) }}"
+    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://YOUR_SERVER_IP:8443', true) }}"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     stargate_validate_certs: false
 

@@ -11,7 +11,7 @@ produces the same end state without creating duplicate resources.
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     test_connection_name: "test-idempotent-conn"
 
@@ -52,7 +52,7 @@ produces the same end state without creating duplicate resources.
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     test_group_name: "test-idempotent-group"
 
@@ -81,7 +81,7 @@ produces the same end state without creating duplicate resources.
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     test_connection_name: "test-idempotent-delete"
 
@@ -124,7 +124,7 @@ produces the same end state without creating duplicate resources.
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -158,7 +158,7 @@ produces the same end state without creating duplicate resources.
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -192,7 +192,7 @@ produces the same end state without creating duplicate resources.
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:

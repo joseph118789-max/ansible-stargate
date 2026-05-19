@@ -57,8 +57,8 @@ EXAMPLES = r'''
 # Get all connections
 - name: Fetch connections
   company.stargate.stargate_connection:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     operation: connectionGet
     start: 0
     length: 10
@@ -67,16 +67,16 @@ EXAMPLES = r'''
 # Count connections
 - name: Count all connections
   company.stargate.stargate_connection:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     operation: connectionCount
   register: result
 
 # Create a connection
 - name: Create new connection
   company.stargate.stargate_connection:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     operation: connectionCreate
     connection_data:
       name: "TestConnection"
@@ -88,8 +88,8 @@ EXAMPLES = r'''
 # Delete a connection
 - name: Delete connection
   company.stargate.stargate_connection:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     operation: connectionDelete
     connection_data:
       id: 123

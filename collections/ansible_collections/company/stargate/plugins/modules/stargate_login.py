@@ -48,15 +48,15 @@ EXAMPLES = r'''
 # Login with API user and secret
 - name: Login to Stargate
   company.stargate.stargate_login:
-    server: "https://10.201.208.160:8443"
+    server: "https://YOUR_SERVER_IP:8443"
     username: "ansible"
-    password: "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    password: "YOUR_TOKEN"
   register: login_result
 
 # Use token in subsequent calls
 - name: Get users
   company.stargate.stargate_get:
-    server: "https://10.201.208.160:8443"
+    server: "https://YOUR_SERVER_IP:8443"
     token: "{{ login_result.token }}"
     endpoint: "/userGet"
     data:

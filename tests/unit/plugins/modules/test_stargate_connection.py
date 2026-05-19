@@ -226,7 +226,7 @@ class TestStargateConnectionAuthHeader:
 
     def test_bearer_token_format(self):
         """Test Bearer token format."""
-        token = "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        token = "ansible:YOUR_TOKEN"
         token_b64 = base64.b64encode(token.encode()).decode()
         bearer = f"Bearer {token_b64}"
         
@@ -235,7 +235,7 @@ class TestStargateConnectionAuthHeader:
 
     def test_headers_json_format(self):
         """Test headers dict format."""
-        token_b64 = base64.b64encode(b"ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c").decode()
+        token_b64 = base64.b64encode(b"ansible:YOUR_TOKEN").decode()
         
         headers = {
             "Authorization": f"Bearer {token_b64}",

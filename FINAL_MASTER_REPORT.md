@@ -1,6 +1,6 @@
 # STARGATE API & LOGIN UI - FINAL MASTER REPORT
 **Generated:** 2026-05-18 17:45 UTC
-**Server:** https://10.201.208.160:8443
+**Server:** https://YOUR_SERVER_IP:8443
 **API Doc Version:** 11.7.0
 **Server Version:** 11.5.0
 
@@ -226,7 +226,7 @@ java.lang.NullPointerException: Cannot invoke "String.toLowerCase()" because "na
 ## REST API Auth Format
 ```bash
 # Header: Authorization: Bearer <base64("username:token")>
-curl -X GET "https://10.201.208.160:8443/adama/rest/userGet" \
+curl -X GET "https://YOUR_SERVER_IP:8443/adama/rest/userGet" \
   -H "Authorization: Bearer YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=" \
   -H "Content-Type: application/json" \
   -d '{"start": "0", "length": "50"}'
@@ -234,7 +234,7 @@ curl -X GET "https://10.201.208.160:8443/adama/rest/userGet" \
 
 **Credentials:**
 - Username: `ansible`
-- Token: `f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c`
+- Token: `YOUR_TOKEN`
 - Base64: `YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=`
 
 ---

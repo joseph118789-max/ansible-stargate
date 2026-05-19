@@ -11,7 +11,7 @@ Manage Stargate user operations via REST API.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `stargate_server` | Stargate server URL | `https://10.201.208.160:8443` |
+| `stargate_server` | Stargate server URL | `https://YOUR_SERVER_IP:8443` |
 | `stargate_token` | Authentication token | `""` |
 | `stargate_validate_certs` | Validate SSL certificates | `false` |
 | `stargate_use_ssl` | Use SSL/TLS | `true` |

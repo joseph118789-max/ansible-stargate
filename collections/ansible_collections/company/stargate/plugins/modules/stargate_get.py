@@ -46,8 +46,8 @@ EXAMPLES = r'''
 # Get all users
 - name: Fetch users
   company.stargate.stargate_get:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     endpoint: "/userGet"
     data:
       start: 0
@@ -57,8 +57,8 @@ EXAMPLES = r'''
 # Get connections
 - name: Fetch connections
   company.stargate.stargate_get:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     endpoint: "/connectionGet"
     data:
       start: 0

@@ -45,7 +45,7 @@ ansible-galaxy collection install company-stargate-*.tar.gz --force
   tasks:
     - name: Retrieve users
       company.stargate.stargate_get:
-        server: "https://10.201.208.160:8443"
+        server: "https://YOUR_SERVER_IP:8443"
         token: "ansible:YOUR_TOKEN_HERE"
         endpoint: "/userGet"
         data:

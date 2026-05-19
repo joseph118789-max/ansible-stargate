@@ -56,8 +56,8 @@ EXAMPLES = r'''
 # Get account info
 - name: Fetch accounts
   company.stargate.stargate_account:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     operation: accountCommonGet
     start: 0
     length: 10
@@ -66,8 +66,8 @@ EXAMPLES = r'''
 # Create an account
 - name: Create new account
   company.stargate.stargate_account:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     operation: accountCreate
     account_data:
       name: "testaccount"
@@ -77,8 +77,8 @@ EXAMPLES = r'''
 # Get account password
 - name: Get account password
   company.stargate.stargate_account:
-    server: "https://10.201.208.160:8443"
-    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    server: "https://YOUR_SERVER_IP:8443"
+    token: "ansible:YOUR_TOKEN"
     operation: accountPasswordGet
     account_data:
       id: 123

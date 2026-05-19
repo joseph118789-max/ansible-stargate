@@ -51,7 +51,7 @@ graph TB
 
 | Component | Host | Port | Description |
 |-----------|------|------|-------------|
-| Stargate Server | 10.201.208.160 | 8443 | Main application server |
+| Stargate Server | YOUR_SERVER_IP | 8443 | Main application server |
 | Tomcat | localhost | 8080 | Java servlet container |
 | MariaDB | localhost | 3306 | Primary database |
 | MaxScale | localhost | 4006 | Database proxy/load balancer |
@@ -80,10 +80,10 @@ sequenceDiagram
 
 ```bash
 # Format: base64("username:token")
-TOKEN=$(echo -n "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c" | base64)
+TOKEN=$(echo -n "ansible:YOUR_TOKEN" | base64)
 # YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM=
 
-curl -X POST https://10.201.208.160:8443/adama/rest/userGet \
+curl -X POST https://YOUR_SERVER_IP:8443/adama/rest/userGet \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{"start": "0", "length": "10"}'
@@ -99,7 +99,7 @@ curl -X POST https://10.201.208.160:8443/adama/rest/userGet \
 | Field | Value |
 |-------|-------|
 | Username | ansible |
-| Token | f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c |
+| Token | YOUR_TOKEN |
 | Base64 | YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM= |
 | Header | Authorization: Bearer YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM= |
 
@@ -110,7 +110,7 @@ curl -X POST https://10.201.208.160:8443/adama/rest/userGet \
 ### Base URL
 
 ```
-https://10.201.208.160:8443/adama/rest/
+https://YOUR_SERVER_IP:8443/adama/rest/
 ```
 
 ### Endpoint Categories
@@ -915,7 +915,7 @@ These issues are in the Stargate server code and cannot be fixed without source 
 
 ```bash
 # Generate Bearer token
-echo -n "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c" | base64
+echo -n "ansible:YOUR_TOKEN" | base64
 # Output: YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM=
 ```
 
@@ -923,13 +923,13 @@ echo -n "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c" | base64
 
 ```bash
 # Get user count
-curl -X POST https://10.201.208.160:8443/adama/rest/userCount \
+curl -X POST https://YOUR_SERVER_IP:8443/adama/rest/userCount \
   -H "Authorization: Bearer YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM=" \
   -H "Content-Type: application/json" \
   -d '{}'
 
 # Get connections
-curl -X POST https://10.201.208.160:8443/adama/rest/connectionGet \
+curl -X POST https://YOUR_SERVER_IP:8443/adama/rest/connectionGet \
   -H "Authorization: Bearer YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM=" \
   -H "Content-Type: application/json" \
   -d '{"start": "0", "length": "50"}'

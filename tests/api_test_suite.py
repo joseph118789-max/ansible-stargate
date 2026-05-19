@@ -3,8 +3,8 @@
 Stargate REST API v11.7.0 - Complete Test Script
 Tests all 74 documented endpoints with proper test data
 
-Server: https://10.201.208.160:8443
-Auth: base64("ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c")
+Server: https://YOUR_SERVER_IP:8443
+Auth: base64("ansible:YOUR_TOKEN")
 """
 
 import urllib.request
@@ -16,8 +16,8 @@ import time
 from datetime import datetime
 
 # Configuration
-SERVER = 'https://10.201.208.160:8443'
-TOKEN = 'ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c'
+SERVER = 'https://YOUR_SERVER_IP:8443'
+TOKEN = 'ansible:YOUR_TOKEN'
 AUTH_B64 = base64.b64encode(TOKEN.encode()).decode()
 
 # SSL context (self-signed cert)

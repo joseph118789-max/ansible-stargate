@@ -152,8 +152,8 @@ pip install requests PyYAML ansible
 # inventory.yml
 all:
   vars:
-    stargate_server: "https://10.201.208.160:8443"
-    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
+    stargate_token: "ansible:YOUR_TOKEN"
     validate_certs: false
 ```
 
@@ -379,7 +379,7 @@ molecule test
 ### Role Variables
 
 ```yaml
-stargate_server: "https://10.201.208.160:8443"
+stargate_server: "https://YOUR_SERVER_IP:8443"
 stargate_token: "ansible:TOKEN"
 stargate_validate_certs: false
 stargate_timeout: 30
@@ -394,10 +394,10 @@ stargate_retries: 3
 
 ```bash
 # Test server connectivity
-curl -k -I https://10.201.208.160:8443/adama/
+curl -k -I https://YOUR_SERVER_IP:8443/adama/
 
 # Test API endpoint
-curl -k -H "Authorization: Bearer TOKEN" https://10.201.208.160:8443/adama/rest/userCount
+curl -k -H "Authorization: Bearer TOKEN" https://YOUR_SERVER_IP:8443/adama/rest/userCount
 ```
 
 ### Authentication Errors

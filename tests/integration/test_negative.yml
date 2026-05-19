@@ -7,7 +7,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     invalid_token: "ansible:invalid-token-12345"
 
   tasks:
@@ -34,7 +34,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -55,7 +55,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -76,7 +76,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -99,7 +99,7 @@
     - name: Test with invalid server URL
       company.stargate.stargate_get:
         server: "https://invalid.server.local:8443"
-        token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        token: "ansible:YOUR_TOKEN"
         endpoint: "/userGet"
         data:
           start: "0"
@@ -113,7 +113,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -135,7 +135,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -171,7 +171,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:
@@ -192,7 +192,7 @@
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
 
   tasks:

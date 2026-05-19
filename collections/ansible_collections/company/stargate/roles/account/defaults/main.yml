@@ -1,7 +1,7 @@
 ---
 # defaults file for account role
 
-stargate_server: "https://10.201.208.160:8443"
+stargate_server: "https://YOUR_SERVER_IP:8443"
 stargate_token: ""
 stargate_validate_certs: false
 stargate_use_ssl: true

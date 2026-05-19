@@ -3,11 +3,11 @@
 ## API Authentication
 - **Format:** `Authorization: Bearer <base64(username:token)>`
 - **Username:** `ansible`
-- **Token:** `f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c`
+- **Token:** `YOUR_TOKEN`
 - **Base64:** `YW5zYmxlOmQxNDdlZGYxLTIxNDYtNDg3Yy04MzNlLTI4MTU0OTAzYWZjNQ==`
 
 ## Server
-- **URL:** `https://10.201.208.160:8443/adama/rest/{endpoint}`
+- **URL:** `https://YOUR_SERVER_IP:8443/adama/rest/{endpoint}`
 - **Auth:** JAAS with Bearer token (base64 encoded)
 
 ---

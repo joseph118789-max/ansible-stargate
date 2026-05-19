@@ -22,7 +22,7 @@ class TestStargateLoginAuthFormat:
     def test_bearer_token_format(self):
         """Test that Bearer token is correctly formatted."""
         username = "ansible"
-        token = "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        token = "YOUR_TOKEN"
         
         # Base64 encode username:token
         auth_b64 = base64.b64encode(f"{username}:{token}".encode()).decode()
@@ -36,7 +36,7 @@ class TestStargateLoginAuthFormat:
 
     def test_token_base64_encoding(self):
         """Test token is properly base64 encoded."""
-        token = "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        token = "ansible:YOUR_TOKEN"
         encoded = base64.b64encode(token.encode()).decode()
         
         # Verify it's valid base64
@@ -45,7 +45,7 @@ class TestStargateLoginAuthFormat:
 
     def test_auth_header_format(self):
         """Test Authorization header format."""
-        token_b64 = base64.b64encode(b"ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c").decode()
+        token_b64 = base64.b64encode(b"ansible:YOUR_TOKEN").decode()
         
         headers = {
             "Authorization": f"Bearer {token_b64}",
@@ -61,18 +61,18 @@ class TestStargateLoginEndpoint:
 
     def test_login_url_construction(self):
         """Test login endpoint URL is correctly formed."""
-        server = "https://10.201.208.160:8443"
+        server = "https://YOUR_SERVER_IP:8443"
         # Stargate API uses /adama/rest prefix
         endpoint = "/adama/rest/userGet"
         
         url = f"{server}{endpoint}"
         
-        assert url == "https://10.201.208.160:8443/adama/rest/userGet"
+        assert url == "https://YOUR_SERVER_IP:8443/adama/rest/userGet"
         assert server.startswith("https://")
 
     def test_full_url_construction(self):
         """Test full URL with query parameters."""
-        server = "https://10.201.208.160:8443"
+        server = "https://YOUR_SERVER_IP:8443"
         endpoint = "/adama/rest/userGet"
         
         # Pagination params as strings (Stargate requirement)
@@ -111,7 +111,7 @@ class TestStargateLoginResponseParsing:
     def test_token_response_structure(self):
         """Test token response structure."""
         token_response = {
-            'token': 'f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c',
+            'token': 'YOUR_TOKEN',
             'userId': 'user-123'
         }
         
@@ -127,9 +127,9 @@ class TestStargateLoginModuleParams:
         required_params = ['server', 'username', 'password']
         
         module_params = {
-            'server': 'https://10.201.208.160:8443',
+            'server': 'https://YOUR_SERVER_IP:8443',
             'username': 'ansible',
-            'password': 'f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c'
+            'password': 'YOUR_TOKEN'
         }
         
         for param in required_params:
@@ -154,7 +154,7 @@ class TestStargateLoginModuleParams:
     def test_token_storage_format(self):
         """Test token is stored in correct format for facts."""
         facts = {}
-        token = "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        token = "ansible:YOUR_TOKEN"
         facts['stargate_token'] = token
         
         assert facts['stargate_token'] == token

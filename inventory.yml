@@ -5,15 +5,15 @@ all:
   vars:
     # Stargate Server Configuration
     # IMPORTANT: Set these via environment variables or ansible-vault
-    #   export STARIMATE_SERVER="https://10.201.208.160:8443"
+    #   export STARIMATE_SERVER="https://YOUR_SERVER_IP:8443"
     #   export STARIMATE_TOKEN="ansible:YOUR_TOKEN_HERE"
     #
     # Or override with -e flag:
     #   ansible-playbook -i inventory.yml playbook.yml \
-    #     -e "stargate_server=https://10.201.208.160:8443" \
+    #     -e "stargate_server=https://YOUR_SERVER_IP:8443" \
     #     -e "stargate_token=ansible:YOUR_TOKEN"
     
-    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://10.201.208.160:8443', true) }}"
+    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://YOUR_SERVER_IP:8443', true) }}"
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     stargate_validate_certs: false
     stargate_timeout: 30
@@ -30,7 +30,7 @@ all:
     stargate_servers:
       hosts:
         stargate-01:
-          ansible_host: 10.201.208.160
+          ansible_host: YOUR_SERVER_IP
           ansible_user: root
           ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 
@@ -40,7 +40,7 @@ all:
 production:
   vars:
     # Override defaults for production
-    stargate_server: "https://10.201.208.160:8443"
+    stargate_server: "https://YOUR_SERVER_IP:8443"
     stargate_validate_certs: false
     # Token should come from environment or vault
     stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
@@ -48,7 +48,7 @@ production:
     api_servers:
       hosts:
         stargate-prod:
-          ansible_host: 10.201.208.160
+          ansible_host: YOUR_SERVER_IP
         stargate-dr:
           ansible_host: 10.201.208.161
     monitoring_targets:

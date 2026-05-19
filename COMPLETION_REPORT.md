@@ -1,6 +1,6 @@
 # Stargate REST API - COMPLETION REPORT
 **Date:** 2026-05-18  
-**Server:** https://10.201.208.160:8443  
+**Server:** https://YOUR_SERVER_IP:8443  
 **API Version:** 11.7.0
 
 ---
@@ -157,13 +157,13 @@ These endpoints exist but require specific parameters or valid IDs:
 **Credentials:**
 ```
 Username: ansible
-Token: f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c
+Token: YOUR_TOKEN
 Base64: YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=
 ```
 
 **Usage:**
 ```bash
-curl -X GET "https://10.201.208.160:8443/adama/rest/userGet" \
+curl -X GET "https://YOUR_SERVER_IP:8443/adama/rest/userGet" \
   -H "Authorization: Bearer YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=" \
   -H "Content-Type: application/json" \
   -d '{"start": 0, "length": 50}'

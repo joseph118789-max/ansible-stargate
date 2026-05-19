@@ -21,8 +21,8 @@ class TestStargateAPIWrapper:
     def mock_module(self):
         module = Mock()
         module.params = {
-            'server': 'https://10.201.208.160:8443',
-            'token': 'ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c',
+            'server': 'https://YOUR_SERVER_IP:8443',
+            'token': 'ansible:YOUR_TOKEN',
             'validate_certs': False,
             'use_ssl': True
         }
@@ -66,7 +66,7 @@ class TestStargateAPIWrapper:
 
         call_kwargs = mock_fetch_url.call_args[1]
         auth_header = call_kwargs['headers']['Authorization']
-        expected_b64 = base64.b64encode(b'ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c').decode()
+        expected_b64 = base64.b64encode(b'ansible:YOUR_TOKEN').decode()
         assert auth_header == f'Bearer {expected_b64}'
 
     @patch('stargate_utils.fetch_url')
@@ -213,14 +213,14 @@ class TestStargateUtilsHelpers:
     def test_base64_encode_token(self):
         """Test that username:token is correctly base64 encoded."""
         username = "ansible"
-        token = "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        token = "YOUR_TOKEN"
         expected = base64.b64encode(f"{username}:{token}".encode()).decode()
-        assert expected == base64.b64encode("ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c".encode()).decode()
+        assert expected == base64.b64encode("ansible:YOUR_TOKEN".encode()).decode()
 
     def test_bearer_token_format(self):
         """Test Bearer token format is correct."""
         username = "ansible"
-        token = "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        token = "YOUR_TOKEN"
         token_b64 = base64.b64encode(f"{username}:{token}".encode()).decode()
         bearer = f"Bearer {token_b64}"
         assert bearer.startswith("Bearer ")
@@ -228,10 +228,10 @@ class TestStargateUtilsHelpers:
 
     def test_api_url_construction(self):
         """Test API URL is correctly constructed."""
-        base_url = "https://10.201.208.160:8443/adama/rest"
+        base_url = "https://YOUR_SERVER_IP:8443/adama/rest"
         endpoint = "/userGet"
         expected = f"{base_url}{endpoint}"
-        assert expected == "https://10.201.208.160:8443/adama/rest/userGet"
+        assert expected == "https://YOUR_SERVER_IP:8443/adama/rest/userGet"
 
     def test_json_payload_serialization(self):
         """Test JSON payload is correctly serialized."""

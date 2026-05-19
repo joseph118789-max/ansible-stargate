@@ -1,6 +1,6 @@
 # Stargate REST API & UI - FINAL COMPLETION REPORT
 **Date:** 2026-05-18  
-**Server:** https://10.201.208.160:8443  
+**Server:** https://YOUR_SERVER_IP:8443  
 **API Version:** 11.7.0 (documented) / 11.5.0 (deployed)
 
 ---
@@ -40,7 +40,7 @@ java.lang.NullPointerException: Cannot invoke "String.toLowerCase()" because "na
 - **This is a Java code bug requiring source code access to fix**
 
 **6. What Works:**
-- ✅ Login page loads at `https://10.201.208.160:8443/adama/`
+- ✅ Login page loads at `https://YOUR_SERVER_IP:8443/adama/`
 - ✅ API token endpoint returns mock authToken
 - ✅ User can see the login form
 - ❌ Cannot complete authentication due to Java NPE in `AuthServiceImpl`
@@ -125,7 +125,7 @@ These are documented in API spec but NOT implemented in server version 11.5.0:
 **Working REST API Authentication:**
 ```bash
 # Format: base64("username:token")
-curl -X GET "https://10.201.208.160:8443/adama/rest/userGet" \
+curl -X GET "https://YOUR_SERVER_IP:8443/adama/rest/userGet" \
   -H "Authorization: Bearer YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=" \
   -H "Content-Type: application/json" \
   -d '{"start": "0", "length": "50"}'
@@ -134,7 +134,7 @@ curl -X GET "https://10.201.208.160:8443/adama/rest/userGet" \
 **Credentials:**
 | User | Token | Purpose |
 |------|-------|---------|
-| ansible | f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c | REST API access |
+| ansible | YOUR_TOKEN | REST API access |
 
 ---
 

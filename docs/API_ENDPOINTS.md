@@ -1,7 +1,7 @@
 # Stargate REST API v11.7.0 - Complete Endpoint Reference
 
 **Source:** MasterSAM REST API Documentation (official HTML) + DB Analysis  
-**Server:** https://10.201.208.160:8443  
+**Server:** https://YOUR_SERVER_IP:8443  
 **Base Path:** /adama/rest/{endpoint}  
 **Auth:** base64(username:token) as Bearer token
 
@@ -14,7 +14,7 @@ Stargate uses **Bearer token** authentication with format: `base64(username:toke
 ```python
 import base64
 
-token = "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+token = "ansible:YOUR_TOKEN"
 auth_b64 = base64.b64encode(token.encode()).decode()
 
 headers = {

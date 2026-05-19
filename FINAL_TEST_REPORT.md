@@ -1,6 +1,6 @@
 # Stargate REST API - Final Test Report
 **Date:** 2026-05-18  
-**Server:** https://10.201.208.160:8443  
+**Server:** https://YOUR_SERVER_IP:8443  
 **API Version:** 11.7.0
 
 ---
@@ -89,7 +89,7 @@ These endpoints exist but require specific parameters or data:
 ## Authentication
 
 **Format:** `Authorization: Bearer <base64("username:token")>`  
-**Credentials:** `ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c`  
+**Credentials:** `ansible:YOUR_TOKEN`  
 **Base64:** `YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=`
 
 ---
