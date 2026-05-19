@@ -12,7 +12,7 @@ The `company.stargate` collection provides enterprise-grade automation for Maste
 
 **API Version:** v11.7.0  
 **Authentication:** Bearer token (base64 encoded username:token)  
-**Server:** `https://10.201.208.160:8443`
+**Server:** `{{ stargate_server }}` (via `STARIMATE_SERVER` env var)
 
 ---
 
@@ -31,7 +31,7 @@ The `company.stargate` collection provides enterprise-grade automation for Maste
 │                   (88 endpoints documented)                 │
 ├─────────────────────────────────────────────────────────────┤
 │                  MasterSAM Stargate Server                   │
-│                     (10.201.208.160)                        │
+│                     (YOUR_SERVER_IP)                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
