@@ -28,7 +28,7 @@ class TestStargateLoginAuthFormat:
         auth_b64 = base64.b64encode(f"{username}:{token}".encode()).decode()
         bearer = f"Bearer {auth_b64}"
         
-        expected_b64 = "YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM="
+        expected_b64 = base64.b64encode(b"ansible:YOUR_TOKEN").decode()
         
         assert bearer == f"Bearer {expected_b64}"
         assert bearer.startswith("Bearer ")
@@ -52,7 +52,7 @@ class TestStargateLoginAuthFormat:
             "Content-Type": "application/json"
         }
         
-        assert headers["Authorization"] == "Bearer YW5zaWJsZTpmOGFiMmM4My0wYmNiLTRkMTUtYjVkYS1hZmJjMTljYmI0MWM="
+        assert headers["Authorization"] == f"Bearer {base64.b64encode(b'ansible:YOUR_TOKEN').decode()}"
         assert headers["Content-Type"] == "application/json"
 
 
