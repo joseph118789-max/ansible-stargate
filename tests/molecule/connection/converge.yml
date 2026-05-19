@@ -1,0 +1,58 @@
+# (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+"""Molecule converge playbook for connection testing."""
+
+- name: Converge
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    test_connection_name: "molecule-test-conn"
+
+  tasks:
+    - name: Include stargate collection
+      ansible.builtin.import_role:
+        name: company.stargate.connection
+      when: false
+
+    - name: Get all connections
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionGet"
+        data:
+          start: "0"
+          length: "50"
+      register: connections_result
+
+    - name: Display connection count
+      ansible.builtin.debug:
+        msg: "Found {{ connections_result.data.connection | length }} connections"
+
+    - name: Get connection count
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCount"
+      register: count_result
+
+    - name: Display count
+      ansible.builtin.debug:
+        msg: "Total connections: {{ count_result.data.message }}"
+
+    - name: Get user connections
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionGet"
+        data:
+          userName: "ansible"
+          start: "0"
+          length: "10"
+      register: user_connections
+
+    - name: Display user connections
+      ansible.builtin.debug:
+        msg: "User connections: {{ user_connections.data.connection | length }}"

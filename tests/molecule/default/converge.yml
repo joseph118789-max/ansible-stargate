@@ -1,48 +1,77 @@
-# Copyright (c) 2024 Company Automation Team
+# (c) 2024 Company Automation Team
 # GNU General Public License v3.0+
 
----
-- name: Converge stargate collection
-  hosts: all
-  gather_facts: no
+"""Molecule converge playbook - full workflow test."""
 
+- name: Converge - Full Stargate Workflow
+  hosts: localhost
+  gather_facts: no
   vars:
-    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    validate_certs: false
 
   tasks:
-    - name: Ensure Python dependencies are available
-      pip:
-        name:
-          - pyyaml
-          - requests
-        state: present
+    - name: Step 1 - Get server info (ping equivalent)
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userCount"
+        validate_certs: "{{ validate_certs }}"
+      register: server_info
 
-    - name: Verify collection structure
-      assert:
+    - name: Display server status
+      ansible.builtin.debug:
+        msg: "Server responded with count: {{ server_info.data.message }}"
+
+    - name: Step 2 - Get users
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+        validate_certs: "{{ validate_certs }}"
+      register: users_result
+
+    - name: Display users
+      ansible.builtin.debug:
+        msg: "Found {{ users_result.data.user | length }} users"
+
+    - name: Step 3 - Get connections
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionGet"
+        data:
+          start: "0"
+          length: "10"
+        validate_certs: "{{ validate_certs }}"
+      register: connections_result
+
+    - name: Display connections
+      ansible.builtin.debug:
+        msg: "Found {{ connections_result.data.connection | length }} connections"
+
+    - name: Step 4 - Get accounts
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/accountCommonGet"
+        data:
+          start: "0"
+          length: "10"
+        validate_certs: "{{ validate_certs }}"
+      register: accounts_result
+
+    - name: Display accounts
+      ansible.builtin.debug:
+        msg: "Found {{ accounts_result.data.account | length }} accounts"
+
+    - name: Step 5 - Verify data structures
+      ansible.builtin.assert:
         that:
-          - lookup('file', '~/.ansible/collections/ansible_collections/company/stargate/README.md') != ''
-        fail_msg: "Collection not found in expected location"
-        success_msg: "Stargate collection found"
-
-    - name: Include stargate_utils tests verification
-      import_role:
-        name: company.stargate.stargate_utils
-      vars:
-        test_mode: true
-      ignore_errors: yes
-
-    - name: Create a minimal test inventory for validation
-      add_host:
-        name: stargate-test
-        ansible_host: localhost
-        ansible_connection: local
-
-    - name: Validate stargate modules are available
-      assert:
-        that:
-          - "'stargate_login' in lookup('namespace', 'company.stargate')"
-        fail_msg: "stargate_login module not found in collection"
-
-    - name: Print collection info
-      debug:
-        msg: "Stargate collection molecule converge completed successfully"
+          - users_result.data.user is defined
+          - connections_result.data.connection is defined
+          - accounts_result.data.errorMsg is defined or accounts_result.data.account is defined

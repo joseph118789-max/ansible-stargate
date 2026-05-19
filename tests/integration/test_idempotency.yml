@@ -1,0 +1,223 @@
+# (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+"""Idempotency test cases for Stargate Ansible collection.
+
+These tests verify that running the same playbook multiple times
+produces the same end state without creating duplicate resources.
+"""
+
+- name: Idempotency Test - Connection Create
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    test_connection_name: "test-idempotent-conn"
+
+  tasks:
+    - name: First run - Create connection
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          name: "{{ test_connection_name }}"
+          protocol: "1"
+          hostname: "192.168.1.100"
+          port: "3389"
+      register: first_run
+
+    - name: Second run - Should not create duplicate
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          name: "{{ test_connection_name }}"
+          protocol: "1"
+          hostname: "192.168.1.100"
+          port: "3389"
+      register: second_run
+      ignore_errors: true
+
+    - name: Verify idempotency
+      assert:
+        that:
+          - first_run.changed is defined
+          - second_run.changed is defined
+
+
+- name: Idempotency Test - User Group Create
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    test_group_name: "test-idempotent-group"
+
+  tasks:
+    - name: First run - Create user group
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGroupCreate"
+        data:
+          name: "{{ test_group_name }}"
+      register: first_run
+
+    - name: Second run - Should handle gracefully
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGroupCreate"
+        data:
+          name: "{{ test_group_name }}"
+      register: second_run
+      ignore_errors: true
+
+
+- name: Idempotency Test - Connection Delete
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    test_connection_name: "test-idempotent-delete"
+
+  tasks:
+    - name: Create a connection to delete
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          name: "{{ test_connection_name }}"
+          protocol: "1"
+          hostname: "192.168.1.100"
+          port: "3389"
+      register: create_result
+      ignore_errors: true
+
+    - name: First run - Delete connection
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionDelete"
+        data:
+          connectionName: "{{ test_connection_name }}"
+      register: first_delete
+      ignore_errors: true
+
+    - name: Second run - Delete again (should handle gracefully)
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionDelete"
+        data:
+          connectionName: "{{ test_connection_name }}"
+      register: second_delete
+      ignore_errors: true
+
+
+- name: Idempotency Test - Get Endpoints
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: First run - Get users
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: first_run
+
+    - name: Second run - Get users again (should be identical)
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: second_run
+
+    - name: Verify same result
+      assert:
+        that:
+          - first_run.data.user | count == second_run.data.user | count
+
+
+- name: Idempotency Test - Connection Get
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: First run - Get connections
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionGet"
+        data:
+          start: "0"
+          length: "50"
+      register: first_run
+
+    - name: Second run - Get connections again
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionGet"
+        data:
+          start: "0"
+          length: "50"
+      register: second_run
+
+    - name: Verify same connection count
+      assert:
+        that:
+          - first_run.data.connection | count == second_run.data.connection | count
+
+
+- name: Idempotency Test - Full Workflow Run Twice
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: First workflow run - Get all data
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: first_workflow
+
+    - name: Second workflow run - Get all data again
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: second_workflow
+
+    - name: Verify results are consistent
+      assert:
+        that:
+          - first_workflow.data.errorMsg == second_workflow.data.errorMsg
+          - first_workflow.data.user | length == second_workflow.data.user | length

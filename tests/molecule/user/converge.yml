@@ -1,0 +1,52 @@
+# (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+"""Molecule converge playbook for user testing."""
+
+- name: Converge
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Get all users
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "50"
+      register: users_result
+
+    - name: Display user count
+      ansible.builtin.debug:
+        msg: "Found {{ users_result.data.user | length }} users"
+
+    - name: Get user count
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userCount"
+      register: count_result
+
+    - name: Display count
+      ansible.builtin.debug:
+        msg: "Total users: {{ count_result.data.message }}"
+
+    - name: Get specific user by username
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          userName: "mgadmin"
+          start: "0"
+          length: "1"
+      register: admin_user
+
+    - name: Display admin user
+      ansible.builtin.debug:
+        msg: "Admin user: {{ admin_user.data.user }}"

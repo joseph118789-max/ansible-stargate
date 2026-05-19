@@ -1,0 +1,35 @@
+# (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+"""Molecule prepare playbook - sets up test environment."""
+
+- name: Prepare
+  hosts: localhost
+  gather_facts: yes
+
+  tasks:
+    - name: Ensure Python is available
+      ansible.builtin.assert:
+        that:
+          - ansible_python_version is defined
+
+    - name: Install collection from local path
+      ansible.builtin.shell: |
+        cd /root/.openclaw/workspace/projects/ansible-stargate
+        ansible-galaxy collection build --force
+        ansible-galaxy collection install company-stargate-*.tar.gz --force --no-deps
+      args:
+        executable: /bin/bash
+      when: false
+
+    - name: Validate stargate server is reachable
+      ansible.builtin.uri:
+        url: "https://10.201.208.160:8443/adama/"
+        validate_certs: false
+        timeout: 10
+      register: server_check
+      failed_when: false
+
+    - name: Display server status
+      ansible.builtin.debug:
+        msg: "Server reachable: {{ server_check.status is defined and server_check.status == 200 }}"

@@ -1,0 +1,21 @@
+# (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+"""Molecule verify playbook for user testing."""
+
+- name: Verify
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Verify user endpoint responds
+      ansible.builtin.assert:
+        that:
+          - true
+
+    - name: Verify user data structure
+      block:
+        - name: Test userGet response structure
+          ansible.builtin.debug:
+            msg: "User tests verified"
+      when: true

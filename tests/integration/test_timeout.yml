@@ -1,0 +1,209 @@
+# (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+"""Timeout and retry test cases for Stargate Ansible collection.
+
+These tests verify timeout handling and retry behavior.
+"""
+
+- name: Timeout Test - Connection Timeout
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test with very short timeout
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+        timeout: 1
+      register: result
+      ignore_errors: true
+
+
+- name: Timeout Test - Retry on Server Error
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test retry behavior with retries parameter
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+        retries: 3
+        retry_delay: 1
+      register: result
+      ignore_errors: true
+      failed_when: result is succeeded and result.data.errorMsg is none
+
+
+- name: Retry Test - Multiple Retries
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test with explicit retry count
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          name: "test-retry-conn"
+          protocol: "1"
+          hostname: "192.168.1.100"
+          port: "3389"
+        retries: 3
+        retry_delay: 2
+      register: result
+      ignore_errors: true
+
+
+- name: Retry Test - Retry Delay
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test with specific retry delay
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userCount"
+        retries: 2
+        retry_delay: 5
+      register: result
+      ignore_errors: true
+
+
+- name: Load Test - Multiple Sequential Requests
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Run multiple requests sequentially
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/{{ item.endpoint }}"
+        data:
+          start: "0"
+          length: "10"
+      register: "{{ item.name }}"
+      with_items:
+        - { name: "result1", endpoint: "userGet" }
+        - { name: "result2", endpoint: "connectionGet" }
+        - { name: "result3", endpoint: "userCount" }
+        - { name: "result4", endpoint: "connectionCount" }
+
+
+- name: Load Test - Concurrent Requests
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Run multiple requests in parallel
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: async_result
+      async: 60
+      poll: 0
+
+    - name: Wait for async result
+      async_status:
+        jid: "{{ async_result.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 30
+      delay: 2
+
+
+- name: Authentication Failure - Expired Token
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    expired_token: "ansible:00000000-0000-0000-0000-000000000000"
+
+  tasks:
+    - name: Test with expired/invalid token
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ expired_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: result
+      ignore_errors: true
+      failed_when: result is succeeded
+
+
+- name: Authentication Failure - Empty Token
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+
+  tasks:
+    - name: Test with empty token
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: ""
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: result
+      ignore_errors: true
+      failed_when: result is succeeded
+
+
+- name: Server Error Recovery - 500 to 200
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test that module handles transient server errors
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+        retries: 3
+        retry_delay: 1
+      register: result
+      ignore_errors: true

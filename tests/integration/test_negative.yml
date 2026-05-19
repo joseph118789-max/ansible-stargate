@@ -1,0 +1,208 @@
+# (c) 2024 Company Automation Team
+# GNU General Public License v3.0+
+
+"""Negative test cases for Stargate Ansible collection."""
+
+- name: Negative Test - Invalid Authentication
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    invalid_token: "ansible:invalid-token-12345"
+
+  tasks:
+    - name: Test with invalid token - should fail
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ invalid_token }}"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: result
+      ignore_errors: true
+      failed_when: result is succeeded
+
+    - name: Verify auth failure
+      assert:
+        that:
+          - result.failed is defined
+          - result.status_code in [401, 403] or 'error' in result.msg
+
+
+- name: Negative Test - Invalid Endpoint
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test non-existent endpoint - should return 404
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/nonexistentEndpoint"
+        data:
+          start: "0"
+          length: "10"
+      register: result
+      ignore_errors: true
+      failed_when: result is succeeded
+
+
+- name: Negative Test - Missing Required Parameter
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test connectionCreate without name - should fail validation
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          protocol: "1"
+          hostname: "192.168.1.100"
+      register: result
+      ignore_errors: true
+      failed_when: result is succeeded
+
+
+- name: Negative Test - Invalid JSON Body
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test with empty body - should cause 500 error for some endpoints
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data: {}
+      register: result
+      ignore_errors: true
+      # Empty {} may cause issues for some endpoints
+
+
+- name: Negative Test - Invalid Server URL
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Test with invalid server URL
+      company.stargate.stargate_get:
+        server: "https://invalid.server.local:8443"
+        token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+        endpoint: "/userGet"
+        data:
+          start: "0"
+          length: "10"
+      register: result
+      ignore_errors: true
+      failed_when: result is succeeded
+
+
+- name: Negative Test - Wrong Protocol
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test connectionCreate with invalid protocol - should fail
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          name: "test-invalid-protocol"
+          protocol: "99"
+          hostname: "192.168.1.100"
+          port: "3389"
+      register: result
+      ignore_errors: true
+
+
+- name: Negative Test - Duplicate Resource
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Create connection first time
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          name: "test-duplicate-conn"
+          protocol: "1"
+          hostname: "192.168.1.100"
+          port: "3389"
+      register: first_result
+      ignore_errors: true
+
+    - name: Try to create same connection again - should get conflict
+      company.stargate.stargate_post:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/connectionCreate"
+        data:
+          name: "test-duplicate-conn"
+          protocol: "1"
+          hostname: "192.168.1.100"
+          port: "3389"
+      register: second_result
+      ignore_errors: true
+      failed_when: second_result is succeeded
+
+
+- name: Negative Test - SQL Injection in Parameters
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test with SQL injection in userName parameter
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          userName: "' OR '1'='1"
+          start: "0"
+          length: "10"
+      register: result
+      ignore_errors: true
+
+
+- name: Negative Test - Integer instead of String for Pagination
+  hosts: localhost
+  gather_facts: no
+  vars:
+    stargate_server: "https://10.201.208.160:8443"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+
+  tasks:
+    - name: Test with integer pagination - may cause 500 error
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        endpoint: "/userGet"
+        data:
+          start: 0
+          length: 10
+      register: result
+      ignore_errors: true
