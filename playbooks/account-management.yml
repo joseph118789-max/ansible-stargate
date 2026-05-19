@@ -1,42 +1,52 @@
 ---
 # Playbook: Account Management
-# Lists accounts and retrieves account password information for auditing
+# Demonstrates account operations: list, password retrieval, workflow profiles
+#
+# Usage:
+#   ansible-playbook playbooks/account-management.yml \
+#     -e "stargate_server=https://10.201.208.160:8443" \
+#     -e "stargate_token=ansible:YOUR_TOKEN"
+#
 - name: Stargate Account Management
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
-    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://10.201.208.160:8443', true) }}"
+    stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     stargate_validate_certs: false
 
   tasks:
-    # List all accounts with pagination
-    - name: List all accounts
+    # Get all accounts with pagination
+    - name: Get all accounts
       company.stargate.stargate_account:
         server: "{{ stargate_server }}"
         token: "{{ stargate_token }}"
         validate_certs: "{{ stargate_validate_certs }}"
         operation: accountCommonGet
         start: 0
-        length: 100
+        length: 50
       register: accounts_result
 
-    - name: Display accounts list
+    - name: Display accounts
       ansible.builtin.debug:
-        msg:
-          - "=== Account Audit Report ==="
-          - "Total accounts found: {{ accounts_result.account | length if accounts_result.account is list else 0 }}"
+        msg: "Accounts retrieved: {{ accounts_result.accounts | length }} records"
 
-    # Get account details for auditing
-    - name: Show account details for audit
+    # Get workflow profiles (for account creation)
+    - name: Get account workflow profiles
+      company.stargate.stargate_account:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        operation: accountWorkflowProfileGet
+      register: profiles_result
+
+    - name: Display workflow profiles
       ansible.builtin.debug:
-        msg: "Account: {{ item }}"
-      loop: "{{ accounts_result.account }}"
-      when: accounts_result.account is defined and accounts_result.account is iterable
+        var: profiles_result
 
     # Get passwords for specific accounts (requires account ID)
     - name: Get account passwords
-      when: accounts_result.account is defined and accounts_result.account is iterable
+      when: accounts_result.accounts is defined and accounts_result.accounts | length > 0
       block:
         - name: Retrieve password for each account
           company.stargate.stargate_account:
@@ -45,27 +55,21 @@
             validate_certs: "{{ stargate_validate_certs }}"
             operation: accountPasswordGet
             account_data:
-              id: "{{ item.id }}"
+              accountName: "{{ item.name }}"
+              profileId: "{{ item.profileId | default(lookup('env', 'STARIMATE_PROFILE_ID') | default('56bac408', true), true) }}"
+          loop: "{{ accounts_result.accounts[:3] }}"  # Limit to first 3 for safety
           register: password_result
-          loop: "{{ accounts_result.account }}"
-          when: item.id is defined
 
         - name: Display password audit results
           ansible.builtin.debug:
-            msg:
-              - "Account ID: {{ item.item.id }}"
-              - "Account Name: {{ item.item.name | default('N/A') }}"
-              - "Password status: Retrieved"
-          loop: "{{ password_result.results }}"
-          loop_control:
-            label: "{{ item.item.id }}"
+            msg: "Password audit completed for {{ password_result.results | length }} accounts"
           when: password_result.results is defined
+      ignore_errors: yes
 
-    # Summary for audit report
-    - name: Display account audit summary
+    # Summary
+    - name: Display final summary
       ansible.builtin.debug:
         msg:
           - "=== Account Management Summary ==="
-          - "Total accounts audited: {{ accounts_result.account | length if accounts_result.account is list else 0 }}"
-          - "Password audit completed"
-          - "All account operations completed successfully"
+          - "Total accounts: {{ accounts_result.accounts | length | default(0) }}"
+          - "Workflow profiles retrieved"

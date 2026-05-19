@@ -4,7 +4,17 @@
 all:
   vars:
     # Stargate Server Configuration
-    stargate_server: "https://10.201.208.160:8443"
+    # IMPORTANT: Set these via environment variables or ansible-vault
+    #   export STARIMATE_SERVER="https://10.201.208.160:8443"
+    #   export STARIMATE_TOKEN="ansible:YOUR_TOKEN_HERE"
+    #
+    # Or override with -e flag:
+    #   ansible-playbook -i inventory.yml playbook.yml \
+    #     -e "stargate_server=https://10.201.208.160:8443" \
+    #     -e "stargate_token=ansible:YOUR_TOKEN"
+    
+    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://10.201.208.160:8443', true) }}"
+    stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     stargate_validate_certs: false
     stargate_timeout: 30
     stargate_retries: 3
@@ -29,17 +39,18 @@ all:
 
 production:
   vars:
+    # Override defaults for production
     stargate_server: "https://10.201.208.160:8443"
     stargate_validate_certs: false
+    # Token should come from environment or vault
+    stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
   children:
     api_servers:
       hosts:
         stargate-prod:
           ansible_host: 10.201.208.160
-          stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
         stargate-dr:
           ansible_host: 10.201.208.161
-          stargate_token: "ansible:backup-token-here"
     monitoring_targets:
       hosts:
         monitor-01:
@@ -51,9 +62,9 @@ production:
 
 development:
   vars:
-    stargate_server: "https://dev.stargate.local:8443"
+    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://dev.stargate.local:8443', true) }}"
+    stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     stargate_validate_certs: false
-    stargate_token: "ansible:dev-token-here"
   children:
     dev_servers:
       hosts:

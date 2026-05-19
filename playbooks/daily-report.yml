@@ -1,16 +1,22 @@
 ---
 # Playbook: Daily Report
-# Collects and summarizes all Stargate resources
+# Generates daily operational report from Stargate
+#
+# Usage:
+#   ansible-playbook playbooks/daily-report.yml \
+#     -e "stargate_server=https://10.201.208.160:8443" \
+#     -e "stargate_token=ansible:YOUR_TOKEN"
+#
 - name: Stargate Daily Report
   hosts: localhost
   gather_facts: no
   vars:
-    stargate_server: "https://10.201.208.160:8443"
-    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
+    stargate_server: "{{ lookup('env', 'STARIMATE_SERVER') | default('https://10.201.208.160:8443', true) }}"
+    stargate_token: "{{ lookup('env', 'STARIMATE_TOKEN') | default('CHANGE_ME', true) }}"
     stargate_validate_certs: false
 
   tasks:
-    # Get user count
+    # User statistics
     - name: Get user count
       company.stargate.stargate_user:
         server: "{{ stargate_server }}"
@@ -19,7 +25,6 @@
         operation: userCount
       register: user_count
 
-    # Get all users
     - name: Get all users
       company.stargate.stargate_user:
         server: "{{ stargate_server }}"
@@ -30,16 +35,15 @@
         length: 100
       register: all_users
 
-    # Get connection count
+    # Connection statistics
     - name: Get connection count
       company.stargate.stargate_connection:
         server: "{{ stargate_server }}"
         token: "{{ stargate_token }}"
         validate_certs: "{{ stargate_validate_certs }}"
         operation: connectionCount
-      register: connection_count
+      register: conn_count
 
-    # Get all connections
     - name: Get all connections
       company.stargate.stargate_connection:
         server: "{{ stargate_server }}"
@@ -50,7 +54,7 @@
         length: 100
       register: all_connections
 
-    # Get all accounts
+    # Account statistics
     - name: Get all accounts
       company.stargate.stargate_account:
         server: "{{ stargate_server }}"
@@ -61,56 +65,70 @@
         length: 100
       register: all_accounts
 
-    # Compile and display daily report
-    - name: Display daily report header
-      ansible.builtin.debug:
-        msg: "==========================================="
-      changed_when: false
+    # Monitoring statistics
+    - name: Get monitored user count
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        endpoint: /userMonitoringCount
+        data: {}
+      register: monitored_users
 
-    - name: Display daily report
+    - name: Get monitored connection count
+      company.stargate.stargate_get:
+        server: "{{ stargate_server }}"
+        token: "{{ stargate_token }}"
+        validate_certs: "{{ stargate_validate_certs }}"
+        endpoint: /connectionMonitoringCount
+        data: {}
+      register: monitored_connections
+
+    # Generate report
+    - name: Generate daily report
       ansible.builtin.debug:
         msg:
-          - "=== STARGATE DAILY REPORT ==="
-          - "Generated: {{ ansible_date_time.iso8601 }}"
-          - "==========================================="
+          - "=========================================="
+          - "       STARIMATE DAILY REPORT"
+          - "=========================================="
+          - "Date: {{ ansible_date_time.iso8601 }}"
           - ""
-          - "USER SUMMARY"
-          - "----------"
-          - "Total Users: {{ user_count.user }}"
-          - "Active Users: {{ all_users.user | length if all_users.user is iterable else 0 }}"
+          - "USER STATISTICS"
+          - "  Total Users: {{ user_count.user }}"
+          - "  Active Users: {{ all_users.user | json_query('[?isActive==`1`]') | length }}"
+          - "  Admin Users: {{ all_users.user | json_query('[?isAdmin==`1`]') | length }}"
           - ""
-          - "CONNECTION SUMMARY"
-          - "------------------"
-          - "Total Connections: {{ connection_count.connection }}"
-          - "Active Connections: {{ all_connections.connection | length if all_connections.connection is iterable else 0 }}"
+          - "CONNECTION STATISTICS"
+          - "  Total Connections: {{ conn_count.count }}"
+          - "  Connections: {{ all_connections.connections | length }}"
           - ""
-          - "ACCOUNT SUMMARY"
-          - "---------------"
-          - "Total Accounts: {{ all_accounts.account | length if all_accounts.account is iterable else 0 }}"
+          - "ACCOUNT STATISTICS"
+          - "  Total Accounts: {{ all_accounts.accounts | length }}"
           - ""
-          - "==========================================="
-          - "Report completed successfully"
-          - "==========================================="
+          - "MONITORING"
+          - "  Monitored Users: {{ monitored_users.data.message }}"
+          - "  Monitored Connections: {{ monitored_connections.data.message }}"
+          - "=========================================="
 
-    # Save report to file (optional)
+    # Save report to file
     - name: Save report to file
       ansible.builtin.copy:
         content: |
-          STARGATE DAILY REPORT
-          Generated: {{ ansible_date_time.iso8601 }}
+          STARIMATE DAILY REPORT - {{ ansible_date_time.iso8601 }}
           
-          USER SUMMARY
+          USER STATISTICS
           Total Users: {{ user_count.user }}
-          Active Users: {{ all_users.user | length if all_users.user is iterable else 0 }}
+          Active Users: {{ all_users.user | json_query('[?isActive==`1`]') | length }}
+          Admin Users: {{ all_users.user | json_query('[?isAdmin==`1`]') | length }}
           
-          CONNECTION SUMMARY
-          Total Connections: {{ connection_count.connection }}
-          Active Connections: {{ all_connections.connection | length if all_connections.connection is iterable else 0 }}
+          CONNECTION STATISTICS
+          Total Connections: {{ conn_count.count }}
           
-          ACCOUNT SUMMARY
-          Total Accounts: {{ all_accounts.account | length if all_accounts.account is iterable else 0 }}
+          ACCOUNT STATISTICS
+          Total Accounts: {{ all_accounts.accounts | length }}
           
-          Report completed successfully
-        dest: "/tmp/stargate-daily-report-{{ ansible_date_time.year }}-{{ ansible_date_time.month }}-{{ ansible_date_time.day }}.txt"
-        mode: '0644'
-      changed_when: true
+          MONITORING
+          Monitored Users: {{ monitored_users.data.message }}
+          Monitored Connections: {{ monitored_connections.data.message }}
+        dest: "/tmp/stargate-report-{{ ansible_date_time.year }}{{ ansible_date_time.month }}{{ ansible_date_time.day }}.txt"
+      when: ansible_check_mode == false
