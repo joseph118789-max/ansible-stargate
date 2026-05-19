@@ -3,7 +3,7 @@
 ## API Authentication
 - **Format:** `Authorization: Bearer <base64(username:token)>`
 - **Username:** `ansible`
-- **Token:** `d147ef1f-896d-487c-833e-28154903afc5`
+- **Token:** `f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c`
 - **Base64:** `YW5zYmxlOmQxNDdlZGYxLTIxNDYtNDg3Yy04MzNlLTI4MTU0OTAzYWZjNQ==`
 
 ## Server

@@ -13,14 +13,14 @@ class TestStargateUtils:
     def test_base64_encode_token(self):
         """Test that username:token is correctly base64 encoded."""
         username = "ansible"
-        token = "d147ef1f-896d-487c-833e-28154903afc5"
+        token = "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
         expected = base64.b64encode(f"{username}:{token}".encode()).decode()
-        assert expected == base64.b64encode("ansible:d147ef1f-896d-487c-833e-28154903afc5".encode()).decode()
+        assert expected == base64.b64encode("ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c".encode()).decode()
 
     def test_bearer_token_format(self):
         """Test Bearer token format is correct."""
         username = "ansible"
-        token = "d147ef1f-896d-487c-833e-28154903afc5"
+        token = "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
         token_b64 = base64.b64encode(f"{username}:{token}".encode()).decode()
         bearer = f"Bearer {token_b64}"
         assert bearer.startswith("Bearer ")
@@ -35,7 +35,7 @@ class TestStargateUtils:
 
     def test_request_headers(self):
         """Test that request headers are correctly formed."""
-        token_b64 = base64.b64encode(b"ansible:d147ef1f-896d-487c-833e-28154903afc5").decode()
+        token_b64 = base64.b64encode(b"ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c").decode()
         headers = {
             "Authorization": f"Bearer {token_b64}",
             "Content-Type": "application/json"

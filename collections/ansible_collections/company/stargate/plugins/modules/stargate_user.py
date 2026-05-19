@@ -59,7 +59,7 @@ EXAMPLES = r'''
 - name: Fetch users
   company.stargate.stargate_user:
     server: "https://10.201.208.160:8443"
-    token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
     operation: userGet
     start: 0
     length: 10
@@ -69,7 +69,7 @@ EXAMPLES = r'''
 - name: Count all users
   company.stargate.stargate_user:
     server: "https://10.201.208.160:8443"
-    token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
     operation: userCount
   register: result
 
@@ -77,7 +77,7 @@ EXAMPLES = r'''
 - name: Create new user
   company.stargate.stargate_user:
     server: "https://10.201.208.160:8443"
-    token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
     operation: userCreate
     user_data:
       name: "testuser"
@@ -89,7 +89,7 @@ EXAMPLES = r'''
 - name: Update user
   company.stargate.stargate_user:
     server: "https://10.201.208.160:8443"
-    token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
     operation: userUpdate
     user_data:
       id: 123
@@ -101,7 +101,7 @@ EXAMPLES = r'''
 - name: Delete user
   company.stargate.stargate_user:
     server: "https://10.201.208.160:8443"
-    token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
     operation: userDelete
     user_data:
       id: 123

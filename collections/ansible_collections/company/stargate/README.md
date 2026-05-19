@@ -32,7 +32,7 @@ Stargate REST API uses **base64(username:api_secret)** as Bearer token:
     - name: Get connections
       company.stargate.stargate_get:
         server: "https://10.201.208.160:8443"
-        token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+        token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
         endpoint: "/connectionGet"
         data:
           start: 0
@@ -70,7 +70,7 @@ Stargate REST API uses **base64(username:api_secret)** as Bearer token:
   gather_facts: no
   vars:
     stargate_server: "https://10.201.208.160:8443"
-    stargate_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
 
   tasks:
     - name: Get all connections
@@ -110,7 +110,7 @@ Stargate uses **base64(username:token)** encoded as Bearer token:
 import base64
 
 # Token format: "username:api_secret"
-token = "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+token = "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
 auth_b64 = base64.b64encode(token.encode()).decode()
 
 # Use in header:
@@ -156,7 +156,7 @@ company.stargate/
 |-----------|-------|
 | Server | https://10.201.208.160:8443 |
 | API User | ansible |
-| Token | d147ef1f-896d-487c-833e-28154903afc5 |
+| Token | f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c |
 
 ## License
 

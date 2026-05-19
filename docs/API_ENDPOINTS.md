@@ -14,7 +14,7 @@ Stargate uses **Bearer token** authentication with format: `base64(username:toke
 ```python
 import base64
 
-token = "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+token = "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
 auth_b64 = base64.b64encode(token.encode()).decode()
 
 headers = {

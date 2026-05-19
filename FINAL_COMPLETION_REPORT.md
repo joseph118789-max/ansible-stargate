@@ -134,7 +134,7 @@ curl -X GET "https://10.201.208.160:8443/adama/rest/userGet" \
 **Credentials:**
 | User | Token | Purpose |
 |------|-------|---------|
-| ansible | d147ef1f-896d-487c-833e-28154903afc5 | REST API access |
+| ansible | f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c | REST API access |
 
 ---
 

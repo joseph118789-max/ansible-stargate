@@ -1,7 +1,7 @@
 # Stargate REST API 11.7.0 - Complete Test Results
 
 **Server:** `https://10.201.208.160:8443`
-**Auth:** `Authorization: Bearer <base64("ansible:d147ef1f-896d-487c-833e-28154903afc5")>`
+**Auth:** `Authorization: Bearer <base64("ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c")>`
 **Test Date:** 2026-05-18
 
 ## Summary

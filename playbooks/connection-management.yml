@@ -6,7 +6,7 @@
   gather_facts: no
   vars:
     stargate_server: "https://10.201.208.160:8443"
-    stargate_token: "ansible:d147ef1f-896d-487c-833e-28154903afc5"
+    stargate_token: "ansible:f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
     stargate_validate_certs: false
 
   tasks:

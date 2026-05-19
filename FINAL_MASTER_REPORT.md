@@ -234,7 +234,7 @@ curl -X GET "https://10.201.208.160:8443/adama/rest/userGet" \
 
 **Credentials:**
 - Username: `ansible`
-- Token: `d147ef1f-896d-487c-833e-28154903afc5`
+- Token: `f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c`
 - Base64: `YW5zaWJsZTpkMTQ3ZWYxZi04OTZkLTQ4N2MtODMzZS0yODE1NDkwM2FmYzU=`
 
 ---

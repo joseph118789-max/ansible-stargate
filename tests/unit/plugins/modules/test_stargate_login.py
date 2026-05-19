@@ -27,7 +27,7 @@ class TestStargateLogin:
         """Test that token format is correct base64(username:token)."""
         import base64
         username = "ansible"
-        token = "d147ef1f-896d-487c-833e-28154903afc5"
+        token = "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
         encoded = base64.b64encode(f"{username}:{token}".encode()).decode()
         
         # Verify it can be decoded back
@@ -38,7 +38,7 @@ class TestStargateLogin:
         """Test Bearer header format for API calls."""
         import base64
         username = "ansible"
-        token = "d147ef1f-896d-487c-833e-28154903afc5"
+        token = "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
         encoded = base64.b64encode(f"{username}:{token}".encode()).decode()
         
         header = f"Bearer {encoded}"

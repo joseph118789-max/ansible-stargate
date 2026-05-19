@@ -50,7 +50,7 @@ EXAMPLES = r'''
   company.stargate.stargate_login:
     server: "https://10.201.208.160:8443"
     username: "ansible"
-    password: "d147ef1f-896d-487c-833e-28154903afc5"
+    password: "f8ab2c83-0bcb-4d15-b5da-afbc19cbb41c"
   register: login_result
 
 # Use token in subsequent calls
